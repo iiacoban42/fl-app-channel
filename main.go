@@ -47,7 +47,7 @@ func main() {
 	// Setup clients.
 	log.Println("Setting up clients.")
 	bus := wire.NewLocalBus() // Message bus used for off-chain communication.
-	stake := client.EthToWei(big.NewFloat(5))
+	stake := client.EthToWei(big.NewFloat(1))
 	alice := setupGameClient(bus, chainURL, adjudicator, asset, keyAlice, app, stake)
 	bob := setupGameClient(bus, chainURL, adjudicator, asset, keyBob, app, stake)
 
@@ -57,20 +57,21 @@ func main() {
 
 	// Open app channel and play.
 	log.Println("Opening channel.")
+
 	appAlice := alice.OpenAppChannel(bob.WireAddress())
 	appBob := bob.AcceptedChannel()
 
 
-	// Set(model, weight, accuracy, loss int, actorIdx channel.Index)
+	// Set(weight, accuracy, loss int, actorIdx channel.Index)
 	log.Println("Start playing.")
 	log.Println("Alice's turn.")
-	appAlice.Set(2, 0, 0, 0)
+	// appAlice.Set(0, 0, 0, 0)
 
 	log.Println("Bob's turn.")
-	appBob.Set(2, 5, 0, 0)
+	appBob.Set(2, 0, 0)
 
 	log.Println("Alice's turn.")
-	appAlice.Set(2, 5, 66, 44)
+	appAlice.Set(2, 66, 34)
 
 	// log.Println("Bob's turn.")
 	// appBob.Set(1, 1)

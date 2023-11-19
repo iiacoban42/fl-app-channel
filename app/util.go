@@ -38,9 +38,9 @@ func (v FieldValue) String() string {
 	case notSet:
 		return " "
 	case player1:
-		return "x"
+		return "FLServer"
 	case player2:
-		return "o"
+		return "FLClient"
 	default:
 		panic(fmt.Sprintf("unsupported value: %d", v))
 	}
@@ -97,17 +97,17 @@ func (v FieldValue) PlayerIndex() channel.Index {
 // }
 
 func (d FLAppData) CheckFinal() (isFinal bool, winner *channel.Index) {
-
-	if d.Weight != 0 && (d.Accuracy != 0 || d.Loss != 0){
-		if d.Accuracy >= 60 {
-			index := makeFieldValueFromPlayerIdx(1)
+	if d.Round == d.NumberOfRounds - 1 && d.RoundPhase == 2 {
+		if d.Accuracy[d.Round] >= 60 { // FLClient wins
+				index := makeFieldValueFromPlayerIdx(1)
+				playerIndex := index.PlayerIndex()
+				return true, &playerIndex
+			}
+			// FLServer wins
+			index := makeFieldValueFromPlayerIdx(0)
 			playerIndex := index.PlayerIndex()
 			return true, &playerIndex
 		}
-		index := makeFieldValueFromPlayerIdx(0)
-		playerIndex := index.PlayerIndex()
-		return true, &playerIndex
-	}
 
 	return false, nil
 }
@@ -149,15 +149,70 @@ func writeUInt8(w io.Writer, v uint8) error {
 	return err
 }
 
-func readUInt8Array(r io.Reader, n int) ([]uint8, error) {
+func readUInt8Array(r io.Reader, n uint8) ([]uint8, error) {
 	buf := make([]byte, n)
 	_, err := io.ReadFull(r, buf)
 	return buf, err
 }
 
+// read a string from reader
+func readString(r io.Reader, n int) (string, error) {
+	buf := make([]byte, n)
+	_, err := io.ReadFull(r, buf)
+	return string(buf), err
+}
+
+// read a int to string map from reader
+func readUInt8StringMap(r io.Reader, n uint8, strlen uint8) (map[uint8]string, error) {
+	m := make(map[uint8]string)
+	for i := uint8(0); i < n; i++ {
+		v, err := readString(r, int(strlen))
+		if err != nil {
+			return nil, err
+		}
+		m[uint8(i)] = v
+	}
+	return m, nil
+}
+
+// read a int to int map from reader
+func readUInt8UInt8Map(r io.Reader, n int) (map[uint8]uint8, error) {
+	m := make(map[uint8]uint8)
+	for i := 0; i < n; i++ {
+		v, err := readUInt8(r)
+		if err != nil {
+			return nil, err
+		}
+		m[uint8(i)] = v
+	}
+	return m, nil
+}
+
 func writeUInt8Array(w io.Writer, v []uint8) error {
 	_, err := w.Write(v)
 	return err
+}
+
+// write a int to string map to writer
+func writeUInt8StringMap(w io.Writer, m map[uint8]string) error {
+	for _, v := range m {
+		_, err := w.Write([]byte(v))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// write a int to int map to writer
+func writeUInt8UInt8Map(w io.Writer, m map[uint8]uint8) error {
+	for _, v := range m {
+		_, err := w.Write([]byte{v})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func makeFieldValueArray(a []uint8) []FieldValue {
@@ -184,6 +239,25 @@ func makeStringArray(a []FieldValue) []string {
 	return b
 }
 
+// make an int to string map
+func makeUInt8StringMap(n uint8) map[uint8]string {
+	b := make(map[uint8]string)
+	for i := uint8(0); i < n; i++ {
+		b[i] = ""
+	}
+	return b
+}
+
+// make an int to int map
+func makeUInt8UInt8Map(n uint8) map[uint8]uint8 {
+	b := make(map[uint8]uint8)
+	for i := uint8(0); i < n; i++ {
+		b[i] = 0
+	}
+	return b
+}
+
+
 func computeFinalBalances(bals channel.Balances, winner channel.Index) channel.Balances {
 	loser := 1 - winner
 	finalBals := bals.Clone()
@@ -192,4 +266,23 @@ func computeFinalBalances(bals channel.Balances, winner channel.Index) channel.B
 		finalBals[i][loser] = big.NewInt(0)
 	}
 	return finalBals
+}
+
+// check if two maps are equal except for the given key
+func equalExcept(d1, d2 map[uint8]uint8, key uint8) bool {
+	for k, v := range d1 {
+		if k != key && d2[k] != v {
+			return false
+		}
+	}
+	return true
+}
+
+// map to string
+func mapToString(m map[uint8]uint8) string {
+	s := ""
+	for k, v := range m {
+		s += fmt.Sprintf("%v: %v, ", k, v)
+	}
+	return s
 }

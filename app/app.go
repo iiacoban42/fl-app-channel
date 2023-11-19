@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"reflect"
 
 	"github.com/pkg/errors"
 
@@ -41,9 +42,16 @@ func (a *FLApp) Def() wallet.Address {
 	return a.Addr
 }
 
-func (a *FLApp) InitData(firstActor channel.Index) *FLAppData {
+func (a *FLApp) InitData(firstActor channel.Index, modelCID, numberOfRounds uint8) *FLAppData {
 	return &FLAppData{
 		NextActor: uint8(firstActor),
+		ModelCID: uint8(modelCID),
+		RoundPhase: uint8(0),
+		NumberOfRounds: uint8(numberOfRounds),
+		Round: uint8(0),
+		Weights: makeUInt8UInt8Map(uint8(numberOfRounds)),
+		Accuracy: makeUInt8UInt8Map(uint8(numberOfRounds)),
+		Loss: makeUInt8UInt8Map(uint8(numberOfRounds)),
 	}
 }
 
@@ -57,22 +65,37 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading actor")
 	}
 
-	d.Model, err = readUInt8(r)
+	d.ModelCID, err = readUInt8(r)
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading model")
 	}
 
-	d.Weight, err = readUInt8(r)
+	d.NumberOfRounds, err = readUInt8(r)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading number of rounds")
+	}
+
+	d.Round, err = readUInt8(r)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading round")
+	}
+
+	d.RoundPhase, err = readUInt8(r)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading round phase")
+	}
+
+	d.Weights, err = readUInt8UInt8Map(r, int(d.NumberOfRounds))
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading weight")
 	}
 
-	d.Accuracy, err = readUInt8(r)
+	d.Accuracy, err = readUInt8UInt8Map(r, int(d.NumberOfRounds))
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading accuracy")
 	}
 
-	d.Loss, err = readUInt8(r)
+	d.Loss, err = readUInt8UInt8Map(r, int(d.NumberOfRounds))
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading loss")
 	}
@@ -96,26 +119,36 @@ func (a *FLApp) ValidInit(p *channel.Params, s *channel.State) error {
 		return fmt.Errorf("invalid data type: %T", s.Data)
 	}
 
-	zero := FLAppData{}
+	// zero := FLAppData{}
 	// if appData.Grid != zero.Grid {
 	// 	return fmt.Errorf("invalid starting grid: %v", appData.Grid)
 	// }
 
-	if appData.Model != zero.Model {
-		return fmt.Errorf("invalid starting model: %v", appData.Model)
+	if appData.ModelCID <= uint8(0) {
+		return fmt.Errorf("invalid starting model: %v", appData.ModelCID)
 	}
 
-	if appData.Weight != zero.Weight {
-		return fmt.Errorf("invalid starting weight: %v", appData.Weight)
+	if appData.NumberOfRounds <= uint8(0) {
+		return fmt.Errorf("invalid starting number of rounds: %v", appData.NumberOfRounds)
 	}
 
-	if appData.Accuracy != zero.Accuracy {
+	if appData.Round != uint8(0) {
+		return fmt.Errorf("invalid starting round: %v", appData.Round)
+	}
+
+	if !reflect.DeepEqual(appData.Weights, makeUInt8UInt8Map(uint8(appData.NumberOfRounds))){
+		return fmt.Errorf("invalid starting weights: %v", appData.Weights)
+	}
+
+	if !reflect.DeepEqual(appData.Accuracy, makeUInt8UInt8Map(uint8(appData.NumberOfRounds))){
 		return fmt.Errorf("invalid starting accuracy: %v", appData.Accuracy)
 	}
 
-	if appData.Loss != zero.Loss {
+	if !reflect.DeepEqual(appData.Loss, makeUInt8UInt8Map(uint8(appData.NumberOfRounds))){
 		return fmt.Errorf("invalid starting loss: %v", appData.Loss)
 	}
+
+
 
 	if s.IsFinal {
 		return fmt.Errorf("must not be final")
@@ -158,37 +191,66 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 		return fmt.Errorf("invalid next actor: expected %v, got %v", expectedToNextActor, toData.NextActor)
 	}
 
-	// Check grid.
-	// changed := false
-	// for i, v := range toData.Grid {
-	// 	if v > maxFieldValue {
-	// 		return fmt.Errorf("invalid grid value at index %d: %d", i, v)
-	// 	}
-	// 	vFrom := fromData.Grid[i]
-	// 	if v != vFrom {
-	// 		if vFrom != notSet {
-	// 			return fmt.Errorf("cannot overwrite field %d", i)
-	// 		}
-	// 		if changed {
-	// 			return fmt.Errorf("cannot change two fields")
-	// 		}
-	// 		changed = true
-	// 	}
+	// Check data.
+	if fromData.ModelCID != toData.ModelCID {
+		return fmt.Errorf("cannot override model: expected %v, got %v", fromData.ModelCID, toData.ModelCID)
+	}
+
+	if fromData.NumberOfRounds != toData.NumberOfRounds {
+		return fmt.Errorf("cannot override number of rounds: expected %v, got %v", fromData.NumberOfRounds, toData.NumberOfRounds)
+	}
+
+	if toData.Round > toData.NumberOfRounds {
+		return fmt.Errorf("round out of bounds: %v", toData.Round)
+	}
+
+	if fromData.NextActor == uint8(1){ //Client conditions
+		if fromData.Round != toData.Round{
+			return fmt.Errorf("actor: %v cannot override round: expected %v, got %v", fromData.NextActor, fromData.Round, toData.Round)
+		}
+		if !reflect.DeepEqual(fromData.Accuracy, toData.Accuracy){
+			return fmt.Errorf("actor: %v cannot override accuracy: expected %v, got %v", fromData.NextActor, mapToString(fromData.Accuracy), mapToString(toData.Accuracy))
+		}
+		if !reflect.DeepEqual(fromData.Loss, toData.Loss){
+			return fmt.Errorf("actor: %v cannot override loss: expected %v, got %v", fromData.NextActor, mapToString(fromData.Loss), mapToString(toData.Loss))
+		}
+
+		if !equalExcept(fromData.Weights, toData.Weights, toData.Round){
+			return fmt.Errorf("actor: %v cannot override weights outside current round: expected %v, got %v", fromData.NextActor, mapToString(fromData.Weights), mapToString(toData.Weights))
+		}
+
+		if toData.Weights[fromData.Round] == 0 { //weight is not set
+			return fmt.Errorf("actor: %v cannot skip weight %v -> %v", fromData.NextActor, mapToString(fromData.Weights), mapToString(toData.Weights))
+		}
+	}
+
+	if fromData.NextActor == uint8(0){ //Server conditions
+		if toData.Round != fromData.Round+1{
+			return fmt.Errorf("actor: %v must increment round: expected %v, got %v", fromData.NextActor, fromData.Round+1, toData.Round)
+		}
+		if !reflect.DeepEqual(fromData.Weights, toData.Weights){
+			return fmt.Errorf("actor: %v cannot override weights: expected %v, got %v", fromData.NextActor, fromData.Weights, toData.Weights)
+		}
+		if !equalExcept(fromData.Accuracy, toData.Accuracy, toData.Round){
+			return fmt.Errorf("actor: %v cannot override accuracy outside current round: expected %v, got %v", fromData.NextActor, mapToString(fromData.Accuracy), mapToString(toData.Accuracy))
+		}
+
+		if toData.Accuracy[fromData.Round] == 0 { //accuracy is not set
+			return fmt.Errorf("actor: %v cannot skip accuracy", fromData.NextActor)
+		}
+
+		if !equalExcept(fromData.Loss, toData.Loss, toData.Round){
+			return fmt.Errorf("actor: %v cannot override loss outside current round: expected %v, got %v", fromData.NextActor, mapToString(fromData.Loss), mapToString(toData.Loss))
+		}
+
+		if toData.Loss[fromData.Round] == 0{ //loss is not set
+			return fmt.Errorf("actor: %v cannot skip loss", fromData.NextActor)
+		}
+	}
+
+	// if fromData.RoundPhase != toData.RoundPhase {
+	// 	return fmt.Errorf("cannot repeat round phase: %v -> %v", fromData.RoundPhase, toData.RoundPhase)
 	// }
-	//
-	// if !changed {
-	// 	return fmt.Errorf("cannot skip turn")
-	// }
-
-	// check round inputs
-
-
-
-		// Check model.
-	// if toData.Model > maxFieldValue {
-	// 		return fmt.Errorf("invalid model value: %d", toData.Model)
-	// 	}
-
 
 	// Check final and allocation.
 	isFinal, winner := toData.CheckFinal()
@@ -206,13 +268,13 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 }
 
 
-func (a *FLApp) Set(s *channel.State, model, weight, accuracy, loss int, actorIdx channel.Index) error {
+func (a *FLApp) Set(s *channel.State, weight, accuracy, loss int, actorIdx channel.Index) error {
 	d, ok := s.Data.(*FLAppData)
 	if !ok {
 		return fmt.Errorf("invalid data type: %T", d)
 	}
 
-	d.Set(model, weight, accuracy, loss, actorIdx)
+	d.Set(weight, accuracy, loss, actorIdx)
 	log.Println("\n" + d.String())
 
 	if isFinal, winner := d.CheckFinal(); isFinal {

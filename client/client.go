@@ -127,8 +127,11 @@ func (c *AppClient) OpenAppChannel(peer wire.Address) *FLChannel {
 	// Prepare the channel proposal by defining the channel parameters.
 	challengeDuration := uint64(10) // On-chain challenge duration in seconds.
 
-	firstActorIdx := channel.Index(0)
-	withApp := client.WithApp(c.app, c.app.InitData(firstActorIdx))
+	// firstActorIdx := channel.Index(0)
+	nextActor := channel.Index(1)
+	numberOfRounds := uint8(1)
+	modelCID := uint8(42)
+	withApp := client.WithApp(c.app, c.app.InitData(nextActor, modelCID, numberOfRounds))
 
 	proposal, err := client.NewLedgerChannelProposal(
 		challengeDuration,

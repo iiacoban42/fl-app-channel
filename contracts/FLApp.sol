@@ -54,20 +54,35 @@ contract FLApp is App {
         require(params.participants.length == numParts, "number of participants");
 
         uint8 actorIndex = uint8(from.appData[actorDataIndex]);
-        require(to.appData.length == appDataLength, "data length");
+        // require(to.appData.length == appDataLength, "data length");
         require(actorIndex == signerIdx, "actor not signer");
         require((actorIndex + 1) % numParts == uint8(to.appData[actorDataIndex]), "next actor");
 
+
+        require(fromData.ModelCID == toData.ModelCID, string(abi.encodePacked("Cannot override model: expected ", string(fromData.ModelCID), ", got ", string(toData.ModelCID))));
+        require(fromData.NumberOfRounds == toData.NumberOfRounds, string(abi.encodePacked("Cannot override number of rounds: expected ", string(fromData.NumberOfRounds), ", got ", string(toData.NumberOfRounds))));
+        require(toData.Round <= toData.NumberOfRounds, string(abi.encodePacked("Round out of bounds: ", string(toData.Round))));
+
         // Test valid action.
-        bool changed = false;
-        for (uint i = gridDataIndex; i < gridDataIndex + gridDataLength; i++) {
-            require(uint8(to.appData[i]) <= 2, "grid value");
-            if (to.appData[i] != from.appData[i]) {
-                require(uint8(from.appData[i]) == notSet, "overwrite");
-                require(!changed, "two actions");
-                changed = true;
-            }
+        if (fromData.NextActor == uint8(1)) { // Client conditions
+            require(fromData.Round == toData.Round, string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override round: expected ", string(fromData.Round), ", got ", string(toData.Round))));
+            require(equalMaps(fromData.Accuracy, toData.Accuracy, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override accuracy")));
+            require(equalMaps(fromData.Loss, toData.Loss, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override loss")));
+            require(equalExcept(fromData.Weights, toData.Weights, toData.Round), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override weights outside current round")));
+            require(toData.Weights[toData.Round] == 0, "Actor cannot skip weight");
         }
+
+        if (fromData.NextActor == uint8(0)) { // Server conditions
+            require(toData.Round == fromData.Round + 1, string(abi.encodePacked("Actor ", string(fromData.NextActor), " must increment round: expected ", string(fromData.Round + 1), ", got ", string(toData.Round))));
+            require(equalMaps(fromData.Weights, toData.Weights, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override weights)));
+            require(equalExcept(fromData.Accuracy, toData.Accuracy, toData.Round, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override accuracy outside current round")));
+            require(toData.Accuracy[toData.Round] == 0, "Actor cannot skip accuracy");
+            require(equalExcept(fromData.Loss, toData.Loss, toData.Round), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override loss outside current round")));
+            require(toData.Loss[toData.Round] == 0, "Actor cannot skip loss");
+        }
+
+        require(fromData.RoundPhase == toData.RoundPhase, string(abi.encodePacked("Cannot repeat round phase: ", string(fromData.RoundPhase), " -> ", string(toData.RoundPhase))));
+
 
         // Test final state.
         (bool isFinal, bool hasWinner, uint8 winner) = checkFinal(to.appData);
@@ -87,6 +102,26 @@ contract FLApp is App {
         requireEqualUint256ArrayArray(to.outcome.balances, expectedBalances);
     }
 
+
+    function equalMaps(mapping(uint8 => uint8) memory d1, mapping(uint8 => uint8) memory d2, uint8 numberOfRounds) internal view returns (bool) {
+        for (uint8 k = 0; k < numberOfRounds; k++) {
+            if (d2[k] != d1[k]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function equalExcept(mapping(uint8 => uint8) memory d1, mapping(uint8 => uint8) memory d2, uint8 key, uint8 numberOfRounds) internal view returns (bool) {
+        for (uint8 k = 0; k < numberOfRounds; k++) {
+            if (k != key && d2[k] != d1[k]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     /// @dev Asserts that a and b are equal.
     function requireEqualAddressArray(
         address[] memory a,
@@ -101,45 +136,17 @@ contract FLApp is App {
         }
     }
 
+
     function checkFinal(bytes memory d) internal pure returns (bool isFinal, bool hasWinner, uint8 winner) {
-        // 0 1 2
-        // 3 4 5
-        // 6 7 8
-
-        // Check winner.
-        uint8[3][8] memory winningRows = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // horizontal
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // vertical
-        [0, 4, 8], [2, 4, 6]             // diagonal
-        ];
-        for (uint i = 0; i < winningRows.length; i++) {
-            (bool ok, uint8 v) = sameValue(d, winningRows[i]);
-            if (ok) {
-                if (v == firstPlayer) {
-                    return (true, true, 0);
-                } else if (v == secondPlayer) {
-                    return (true, true, 1);
-                }
+        if (d.Round == d.NumberOfRounds - 1 && d.RoundPhase == 2) {
+            if (d.Accuracy[d.Round] >= threshold) {
+                return (true, true, 1); // FLClient wins
+            } else {
+                return (true, true, 0); // FLServer wins
             }
         }
 
-        // Check all set.
-        for (uint i = 0; i < d.length; i++) {
-            if (uint8(d[i]) != notSet) {
-                return (false, false, 0);
-            }
-        }
-        return (true, false, 0);
-    }
-
-    function sameValue(bytes memory d, uint8[3] memory gridIndices) internal pure returns (bool ok, uint8 v) {
-        bytes1 first = d[gridDataIndex + gridIndices[0]];
-        for (uint i = 1; i < gridIndices.length; i++) {
-            if (d[gridDataIndex + gridIndices[i]] != first) {
-                return (false, 0);
-            }
-        }
-        return (true, uint8(first));
+        return (false, false, 0);
     }
 
     function requireEqualUint256ArrayArray(

@@ -21,14 +21,14 @@ func newFLChannel(ch *client.Channel) *FLChannel {
 
 // Set sends a game move to the channel peer.
 
-func (g *FLChannel) Set(model, weight, accuracy, loss int) {
+func (g *FLChannel) Set(weight, accuracy, loss int) {
 	err := g.ch.UpdateBy(context.TODO(), func(state *channel.State) error {
 		app, ok := state.App.(*app.FLApp)
 		if !ok {
 			return fmt.Errorf("invalid app type: %T", app)
 		}
 
-		return app.Set(state, model, weight, accuracy, loss, g.ch.Idx())
+		return app.Set(state, weight, accuracy, loss, g.ch.Idx())
 	})
 	if err != nil {
 		panic(err) // We panic on error to keep the code simple.
@@ -36,7 +36,7 @@ func (g *FLChannel) Set(model, weight, accuracy, loss int) {
 }
 
 // ForceSet registers a game move on-chain.
-func (g *FLChannel) ForceSet(model, weight, accuracy, loss int) {
+func (g *FLChannel) ForceSet(weight, accuracy, loss int) {
 	err := g.ch.ForceUpdate(context.TODO(), func(state *channel.State) {
 		err := func() error {
 			app, ok := state.App.(*app.FLApp)
@@ -44,7 +44,7 @@ func (g *FLChannel) ForceSet(model, weight, accuracy, loss int) {
 				return fmt.Errorf("invalid app type: %T", app)
 			}
 
-			return app.Set(state, model, weight, accuracy, loss, g.ch.Idx())
+			return app.Set(state, weight, accuracy, loss, g.ch.Idx())
 		}()
 		if err != nil {
 			panic(err)
