@@ -14,7 +14,7 @@
 
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
 import "../vendor/openzeppelin-contracts/contracts/math/SafeMath.sol";
@@ -33,7 +33,7 @@ contract AssetHolderETH is AssetHolder {
      * base asset holder contract.
      * @param _adjudicator Address of the adjudicator contract.
      */
-    constructor(address _adjudicator) AssetHolder(_adjudicator) 
+    constructor(address _adjudicator) AssetHolder(_adjudicator)
     {} // solhint-disable-line no-empty-blocks
 
     /**

@@ -14,7 +14,7 @@
 
 // SPDX-License-Identifier: Apache-2.0
 
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
 import "./perun-eth-contracts/contracts/App.sol";
@@ -59,29 +59,29 @@ contract FLApp is App {
         require((actorIndex + 1) % numParts == uint8(to.appData[actorDataIndex]), "next actor");
 
 
-        require(fromData.ModelCID == toData.ModelCID, string(abi.encodePacked("Cannot override model: expected ", string(fromData.ModelCID), ", got ", string(toData.ModelCID))));
-        require(fromData.NumberOfRounds == toData.NumberOfRounds, string(abi.encodePacked("Cannot override number of rounds: expected ", string(fromData.NumberOfRounds), ", got ", string(toData.NumberOfRounds))));
-        require(toData.Round <= toData.NumberOfRounds, string(abi.encodePacked("Round out of bounds: ", string(toData.Round))));
+        require(from.appData.ModelCID == to.appData.ModelCID, string(abi.encodePacked("Cannot override model: expected ", string(from.appData.ModelCID), ", got ", string(to.appData.ModelCID))));
+        require(from.appData.NumberOfRounds == to.appData.NumberOfRounds, string(abi.encodePacked("Cannot override number of rounds: expected ", string(from.appData.NumberOfRounds), ", got ", string(to.appData.NumberOfRounds))));
+        require(to.appData.Round <= to.appData.NumberOfRounds, string(abi.encodePacked("Round out of bounds: ", string(to.appData.Round))));
 
         // Test valid action.
-        if (fromData.NextActor == uint8(1)) { // Client conditions
-            require(fromData.Round == toData.Round, string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override round: expected ", string(fromData.Round), ", got ", string(toData.Round))));
-            require(equalMaps(fromData.Accuracy, toData.Accuracy, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override accuracy")));
-            require(equalMaps(fromData.Loss, toData.Loss, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override loss")));
-            require(equalExcept(fromData.Weights, toData.Weights, toData.Round), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override weights outside current round")));
-            require(toData.Weights[toData.Round] == 0, "Actor cannot skip weight");
+        if (from.appData.NextActor == uint8(1)) { // Client conditions
+            require(from.appData.Round == to.appData.Round, string(abi.encodePacked("Actor ", string(from.appData.NextActor), " cannot override round: expected ", string(from.appData.Round), ", got ", string(to.appData.Round))));
+            require(equalMaps(from.appData.Accuracy, to.appData.Accuracy, from.appData.NumberOfRounds), string(abi.encodePacked("Actor ", string(from.appData.NextActor), " cannot override accuracy")));
+            require(equalMaps(from.appData.Loss, to.appData.Loss, from.appData.NumberOfRounds), string(abi.encodePacked("Actor ", string(from.appData.NextActor), " cannot override loss")));
+            require(equalExcept(from.appData.Weights, to.appData.Weights, to.appData.Round), string(abi.encodePacked("Actor ", string(from.appData.NextActor), " cannot override weights outside current round")));
+            require(to.appData.Weights[to.appData.Round] == 0, "Actor cannot skip weight");
         }
 
-        if (fromData.NextActor == uint8(0)) { // Server conditions
-            require(toData.Round == fromData.Round + 1, string(abi.encodePacked("Actor ", string(fromData.NextActor), " must increment round: expected ", string(fromData.Round + 1), ", got ", string(toData.Round))));
-            require(equalMaps(fromData.Weights, toData.Weights, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override weights)));
-            require(equalExcept(fromData.Accuracy, toData.Accuracy, toData.Round, fromData.NumberOfRounds), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override accuracy outside current round")));
-            require(toData.Accuracy[toData.Round] == 0, "Actor cannot skip accuracy");
-            require(equalExcept(fromData.Loss, toData.Loss, toData.Round), string(abi.encodePacked("Actor ", string(fromData.NextActor), " cannot override loss outside current round")));
-            require(toData.Loss[toData.Round] == 0, "Actor cannot skip loss");
+        if (from.appData.NextActor == uint8(0)) { // Server conditions
+            require(to.appData.Round == from.appData.Round + 1, string(abi.encodePacked("Actor ", string(from.appData.NextActor), " must increment round: expected ", string(from.appData.Round + 1), ", got ", string(to.appData.Round))));
+            require(equalMaps(from.appData.Weights, to.appData.Weights, from.appData.NumberOfRounds), string(abi.encodePacked("Actor ", string(from.appData.NextActor), " cannot override weights")));
+            require(equalExcept(from.appData.Accuracy, to.appData.Accuracy, to.appData.Round, from.appData.NumberOfRounds), string(abi.encodePacked("Actor ", string(from.appData.NextActor), " cannot override accuracy outside current round")));
+            require(to.appData.Accuracy[to.appData.Round] == 0, "Actor cannot skip accuracy");
+            require(equalExcept(from.appData.Loss, to.appData.Loss, to.appData.Round), string(abi.encodePacked("Actor ", string(from.appData.NextActor), " cannot override loss outside current round")));
+            require(to.appData.Loss[to.appData.Round] == 0, "Actor cannot skip loss");
         }
 
-        require(fromData.RoundPhase == toData.RoundPhase, string(abi.encodePacked("Cannot repeat round phase: ", string(fromData.RoundPhase), " -> ", string(toData.RoundPhase))));
+        require(from.appData.RoundPhase == to.appData.RoundPhase, string(abi.encodePacked("Cannot repeat round phase: ", string(from.appData.RoundPhase), " -> ", string(to.appData.RoundPhase))));
 
 
         // Test final state.
