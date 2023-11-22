@@ -28,13 +28,18 @@ import "./perun-eth-contracts/contracts/App.sol";
 contract FLApp is App {
     uint8 constant actorDataIndex = 0;
     uint8 constant actorDataLength = 1;
-    uint8 constant gridDataIndex = actorDataIndex + actorDataLength;
-    uint8 constant gridDataLength = 9;
-    uint8 constant appDataLength = gridDataIndex + gridDataLength; // Actor index + grid.
-    uint8 constant numParts = 2;
-    uint8 constant notSet = 0;
-    uint8 constant firstPlayer = 1;
-    uint8 constant secondPlayer = 2;
+    // uint8 constant gridDataIndex = actorDataIndex + actorDataLength;
+    // uint8 constant gridDataLength = 9;
+    // uint8 constant appDataLength = gridDataIndex + gridDataLength; // Actor index + grid.
+    // uint8 constant numParts = 2;
+    // uint8 constant notSet = 0;
+    // uint8 constant firstPlayer = 1;
+    // uint8 constant secondPlayer = 2;
+    uint8 constant modelIndex = 1;
+    uint8 constant weightIndex = 2;
+    uint8 constant accuracyIndex = 3;
+    uint8 constant lossIndex = 4;
+    uint8 constant appDataLength = 5;
     uint8 constant threshold = 60;
 
     /**
@@ -59,15 +64,15 @@ contract FLApp is App {
         require((actorIndex + 1) % numParts == uint8(to.appData[actorDataIndex]), "next actor");
 
         // Test valid action.
-        bool changed = false;
-        for (uint i = gridDataIndex; i < gridDataIndex + gridDataLength; i++) {
-            require(uint8(to.appData[i]) <= 2, "grid value");
-            if (to.appData[i] != from.appData[i]) {
-                require(uint8(from.appData[i]) == notSet, "overwrite");
-                require(!changed, "two actions");
-                changed = true;
-            }
-        }
+        // bool changed = false;
+        // for (uint i = gridDataIndex; i < gridDataIndex + gridDataLength; i++) {
+        //     require(uint8(to.appData[i]) <= 2, "grid value");
+        //     if (to.appData[i] != from.appData[i]) {
+        //         require(uint8(from.appData[i]) == notSet, "overwrite");
+        //         require(!changed, "two actions");
+        //         changed = true;
+        //     }
+        // }
 
         // Test final state.
         (bool isFinal, bool hasWinner, uint8 winner) = checkFinal(to.appData);
@@ -102,44 +107,14 @@ contract FLApp is App {
     }
 
     function checkFinal(bytes memory d) internal pure returns (bool isFinal, bool hasWinner, uint8 winner) {
-        // 0 1 2
-        // 3 4 5
-        // 6 7 8
-
-        // Check winner.
-        uint8[3][8] memory winningRows = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // horizontal
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // vertical
-        [0, 4, 8], [2, 4, 6]             // diagonal
-        ];
-        for (uint i = 0; i < winningRows.length; i++) {
-            (bool ok, uint8 v) = sameValue(d, winningRows[i]);
-            if (ok) {
-                if (v == firstPlayer) {
-                    return (true, true, 0);
-                } else if (v == secondPlayer) {
-                    return (true, true, 1);
-                }
+        if (d[weightIndex] != 0 && (d[accuracyIndex] != 0 || d[lossIndex] != 0)) {
+            if (d[accuracyIndex] >= threshold) {
+                return (true, true, 1);
             }
+                return (true, true, 0);
         }
+        return (false, false, 0);
 
-        // Check all set.
-        for (uint i = 0; i < d.length; i++) {
-            if (uint8(d[i]) != notSet) {
-                return (false, false, 0);
-            }
-        }
-        return (true, false, 0);
-    }
-
-    function sameValue(bytes memory d, uint8[3] memory gridIndices) internal pure returns (bool ok, uint8 v) {
-        bytes1 first = d[gridDataIndex + gridIndices[0]];
-        for (uint i = 1; i < gridIndices.length; i++) {
-            if (d[gridDataIndex + gridIndices[i]] != first) {
-                return (false, 0);
-            }
-        }
-        return (true, uint8(first));
     }
 
     function requireEqualUint256ArrayArray(

@@ -158,6 +158,13 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 		return fmt.Errorf("invalid next actor: expected %v, got %v", expectedToNextActor, toData.NextActor)
 	}
 
+	// if fromData.NextActor == 0 {
+	// 	// Check model.
+	// 	if toData.Model > maxFieldValue {
+	// 		return fmt.Errorf("invalid model value: %d", toData.Model)
+	// 	}
+
+
 	// Check grid.
 	// changed := false
 	// for i, v := range toData.Grid {
