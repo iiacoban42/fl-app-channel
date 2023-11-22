@@ -32,12 +32,14 @@ contract FLApp is App {
     // uint8 constant gridDataIndex = actorDataIndex + actorDataLength;
     uint8 constant rounds = 1;
     // uint8 constant appDataLength = gridDataIndex + gridDataLength; // Actor index + grid.
-    // uint8 constant numParts = 2;
+    uint8 constant numParts = 2;
     // uint8 constant notSet = 0;
     // uint8 constant firstPlayer = 1;
     // uint8 constant secondPlayer = 2;
     uint8 constant modelIndex = 1;
-    uint8 constant weightIndex = modelIndex + 1;
+    uint8 constant roundIndex = modelIndex + 1;
+    uint8 constant roundPhase = roundIndex + 1;
+    uint8 constant weightIndex = roundPhase + 1;
     uint8 constant accuracyIndex = weightIndex + rounds;
     uint8 constant lossIndex = accuracyIndex + rounds;
     uint8 constant appDataLength = accuracyIndex + rounds;
@@ -109,7 +111,7 @@ contract FLApp is App {
 
     function checkFinal(bytes memory d) internal pure returns (bool isFinal, bool hasWinner, uint8 winner) {
         if (d[weightIndex] != 0 && (d[accuracyIndex] != 0 || d[lossIndex] != 0)) {
-            if (d[accuracyIndex] >= threshold) {
+            if (uint8(d[accuracyIndex]) >= threshold) {
                 return (true, true, 1);
             }
                 return (true, true, 0);

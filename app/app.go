@@ -62,6 +62,16 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading model")
 	}
 
+	d.Round, err = readUInt8(r)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading round")
+	}
+
+	d.RoundPhase, err = readUInt8(r)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading roundPhase")
+	}
+
 	weight, err := readUInt8Array(r, len(d.Weight))
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading weight")
@@ -106,6 +116,14 @@ func (a *FLApp) ValidInit(p *channel.Params, s *channel.State) error {
 
 	if appData.Model != zero.Model {
 		return fmt.Errorf("invalid starting model: %v", appData.Model)
+	}
+
+	if appData.Round != zero.Round {
+		return fmt.Errorf("invalid starting round: %v", appData.Round)
+	}
+
+	if appData.RoundPhase != zero.RoundPhase {
+		return fmt.Errorf("invalid starting roundPhase: %v", appData.RoundPhase)
 	}
 
 	if appData.Weight != zero.Weight {
