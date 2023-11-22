@@ -98,8 +98,8 @@ func (v FieldValue) PlayerIndex() channel.Index {
 
 func (d FLAppData) CheckFinal() (isFinal bool, winner *channel.Index) {
 
-	if d.Weight != 0 && (d.Accuracy != 0 || d.Loss != 0){
-		if d.Accuracy >= 60 {
+	if d.Weight[0] != 0 && (d.Accuracy[0] != 0 || d.Loss[0] != 0){
+		if d.Accuracy[0] >= 60 {
 			index := makeFieldValueFromPlayerIdx(1)
 			playerIndex := index.PlayerIndex()
 			return true, &playerIndex
@@ -168,7 +168,23 @@ func makeFieldValueArray(a []uint8) []FieldValue {
 	return b
 }
 
-func makeUInt8Array(a []FieldValue) []uint8 {
+// func makeUInt8Array(a []FieldValue) []uint8 {
+// 	b := make([]uint8, len(a))
+// 	for i := range b {
+// 		b[i] = uint8(a[i])
+// 	}
+// 	return b
+// }
+
+// func makeStringArray(a []FieldValue) []string {
+// 	b := make([]string, len(a))
+// 	for i := range b {
+// 		b[i] = a[i].String()
+// 	}
+// 	return b
+// }
+
+func makeUInt8Array(a []uint8) []uint8 {
 	b := make([]uint8, len(a))
 	for i := range b {
 		b[i] = uint8(a[i])
@@ -176,13 +192,13 @@ func makeUInt8Array(a []FieldValue) []uint8 {
 	return b
 }
 
-func makeStringArray(a []FieldValue) []string {
-	b := make([]string, len(a))
-	for i := range b {
-		b[i] = a[i].String()
-	}
-	return b
-}
+// func makeStringArray(a []uint8) []string {
+// 	b := make([]string, len(a))
+// 	for i := range b {
+// 		b[i] = a[i].String()
+// 	}
+// 	return b
+// }
 
 func computeFinalBalances(bals channel.Balances, winner channel.Index) channel.Balances {
 	loser := 1 - winner

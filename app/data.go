@@ -18,9 +18,9 @@ type FLAppData struct {
 	NextActor uint8
 	// Grid      [9]FieldValue
 	Model 	  uint8
-	Weight 	  uint8
-	Accuracy  uint8
-	Loss 	  uint8
+	Weight 	  [1]uint8
+	Accuracy  [1]uint8
+	Loss 	  [1]uint8
 }
 
 func (d *FLAppData) String() string {
@@ -45,17 +45,17 @@ func (d *FLAppData) Encode(w io.Writer) error {
 		return errors.WithMessage(err, "writing model")
 	}
 
-	err = writeUInt8(w, d.Weight)
+	err = writeUInt8Array(w, makeUInt8Array(d.Weight[:]))
 	if err != nil {
 		return errors.WithMessage(err, "writing weight")
 	}
 
-	err = writeUInt8(w, d.Accuracy)
+	err = writeUInt8Array(w, makeUInt8Array(d.Accuracy[:]))
 	if err != nil {
 		return errors.WithMessage(err, "writing accuracy")
 	}
 
-	err = writeUInt8(w, d.Loss)
+	err = writeUInt8Array(w, makeUInt8Array(d.Loss[:]))
 	return errors.WithMessage(err, "writing loss")
 
 	// err = writeUInt8Array(w, makeUInt8Array(d.Grid[:]))
@@ -78,11 +78,11 @@ func (d *FLAppData) Set(model, weight, accuracy, loss int, actorIdx channel.Inde
 
 	if d.NextActor == 0 {
 		d.Model = uint8(model)
-		d.Accuracy = uint8(accuracy)
-		d.Loss = uint8(loss)
+		d.Accuracy[0] = uint8(accuracy)
+		d.Loss[0] = uint8(loss)
 
 	} else {
-		d.Weight = uint8(weight)
+		d.Weight[0] = uint8(weight)
 	}
 
 	d.NextActor = calcNextActor(d.NextActor)

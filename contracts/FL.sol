@@ -28,18 +28,19 @@ import "./perun-eth-contracts/contracts/App.sol";
 contract FLApp is App {
     uint8 constant actorDataIndex = 0;
     uint8 constant actorDataLength = 1;
+
     // uint8 constant gridDataIndex = actorDataIndex + actorDataLength;
-    // uint8 constant gridDataLength = 9;
+    uint8 constant rounds = 1;
     // uint8 constant appDataLength = gridDataIndex + gridDataLength; // Actor index + grid.
     // uint8 constant numParts = 2;
     // uint8 constant notSet = 0;
     // uint8 constant firstPlayer = 1;
     // uint8 constant secondPlayer = 2;
     uint8 constant modelIndex = 1;
-    uint8 constant weightIndex = 2;
-    uint8 constant accuracyIndex = 3;
-    uint8 constant lossIndex = 4;
-    uint8 constant appDataLength = 5;
+    uint8 constant weightIndex = modelIndex + 1;
+    uint8 constant accuracyIndex = weightIndex + rounds;
+    uint8 constant lossIndex = accuracyIndex + rounds;
+    uint8 constant appDataLength = accuracyIndex + rounds;
     uint8 constant threshold = 60;
 
     /**

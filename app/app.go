@@ -62,20 +62,23 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading model")
 	}
 
-	d.Weight, err = readUInt8(r)
+	weight, err := readUInt8Array(r, len(d.Weight))
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading weight")
 	}
+	copy(d.Weight[:], weight)
 
-	d.Accuracy, err = readUInt8(r)
+	accuracy, err := readUInt8Array(r, len(d.Accuracy))
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading accuracy")
 	}
+	copy(d.Accuracy[:], accuracy)
 
-	d.Loss, err = readUInt8(r)
+	loss, err := readUInt8Array(r, len(d.Loss))
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading loss")
 	}
+	copy(d.Loss[:], loss)
 
 	// grid, err := readUInt8Array(r, len(d.Grid))
 	// if err != nil {
