@@ -47,31 +47,31 @@ func main() {
 	// Setup clients.
 	log.Println("Setting up clients.")
 	bus := wire.NewLocalBus() // Message bus used for off-chain communication.
-	stake := client.EthToWei(big.NewFloat(1))
-	alice := setupGameClient(bus, chainURL, adjudicator, asset, keyAlice, app, stake)
-	bob := setupGameClient(bus, chainURL, adjudicator, asset, keyBob, app, stake)
+	stake := client.EthToWei(big.NewFloat(50))
+	server := setupGameClient(bus, chainURL, adjudicator, asset, keyAlice, app, stake)
+	client := setupGameClient(bus, chainURL, adjudicator, asset, keyBob, app, stake)
 
 	// Print balances before transactions.
 	l := newBalanceLogger(chainURL)
-	l.LogBalances(alice, bob)
+	l.LogBalances(server, client)
 
 	// Open app channel and play.
 	log.Println("Opening channel.")
 
-	appAlice := alice.OpenAppChannel(bob.WireAddress())
-	appBob := bob.AcceptedChannel()
+	appServer := server.OpenAppChannel(client.WireAddress())
+	appClient := client.AcceptedChannel()
 
 
 	// Set(weight, accuracy, loss int, actorIdx channel.Index)
 	log.Println("Start playing.")
-	log.Println("Alice's turn.")
+	// log.Println("Alice's turn.")
 	// appAlice.Set(0, 0, 0, 0)
 
-	log.Println("Bob's turn.")
-	appBob.Set(2, 0, 0)
+	log.Println("Client sets weights.")
+	appClient.Set(2, 0, 0)
 
-	log.Println("Alice's turn.")
-	appAlice.Set(2, 66, 34)
+	log.Println("Server sets accuracy and loss.")
+	appServer.Set(2, 66, 34)
 
 	// log.Println("Bob's turn.")
 	// appBob.Set(1, 1)
@@ -86,17 +86,19 @@ func main() {
 	// log.Println("Alice's turn.")
 	// appAlice.ForceSet(1, 2)
 
-	log.Println("Bob wins.")
+	log.Println("Client wins.")
 	log.Println("Payout.")
 
 	// Payout.
-	appAlice.Settle()
-	appBob.Settle()
+	log.Println("Client settles")
+	appClient.Settle()
+	log.Println("Server settles")
+	appServer.Settle()
 
 	// Print balances after transactions.
-	l.LogBalances(alice, bob)
+	l.LogBalances(server, client)
 
 	// Cleanup.
-	alice.Shutdown()
-	bob.Shutdown()
+	server.Shutdown()
+	client.Shutdown()
 }
