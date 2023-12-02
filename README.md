@@ -14,3 +14,14 @@ Then run
 ```
 go run .
 ```
+Install the solidity compiler:
+```
+sudo npm i -g solc@0.7.6
+```
+
+To compile the smart contracts and generate the go bindings, run:
+```
+solcjs FL.sol --abi --base-path ./ -o abi --bin --optimize
+abigen --pkg FLApp --abi abi/FL_sol_FLApp.abi --bin abi/FL_sol_FLApp.bin --out ./generated/FLApp/FLApp.go
+```
+
