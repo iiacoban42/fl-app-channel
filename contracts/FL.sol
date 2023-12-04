@@ -85,12 +85,13 @@ contract FLApp is App {
 
             require(from.appData[weightIndex+numRounds] == to.appData[weightIndex+numRounds], string(abi.encodePacked("actor cannot override weights: expected", from.appData[weightIndex+numRounds], ", got ", to.appData[weightIndex+numRounds])));
 
-            // require(!(!equalExcept(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds], int(from.appData[roundIndex]))), string(abi.encodePacked("actor cannot override accuracy outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData.accuracyIndex)));
+            require(equalExcept(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds], uint8(from.appData[roundIndex])), string(abi.encodePacked("actor cannot override accuracy outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData[accuracyIndex])));
+            require(equalExcept(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds], uint8(from.appData[roundIndex])), string(abi.encodePacked("actor cannot override loss outside current round: expected ", from.appData[lossIndex], ", got ", to.appData[lossIndex])));
+
             if (uint8(from.appData[roundPhaseIndex]) != 0){
                 require(uint8(to.appData[accuracyIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip accuracy");
                 require(uint8(to.appData[lossIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip loss");
             }
-            // require(!(!equalExcept(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds], int(from.appData[roundIndex]))), string(abi.encodePacked("actor cannot override loss outside current round: expected ", from.appData[lossIndex], ", got ", to.appData[lossIndex])));
 
         }
 
@@ -103,7 +104,7 @@ contract FLApp is App {
 
             require(from.appData[lossIndex+numRounds] == to.appData[lossIndex+numRounds], string(abi.encodePacked("actor cannot override loss: expected", from.appData[lossIndex+numRounds], ", got ", to.appData[lossIndex+numRounds])));
 
-            // require(!(!equalExcept(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds], int(to.appData[roundIndex]))), string(abi.encodePacked("actor cannot override weight outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData[accuracyIndex])));
+            require(equalExcept(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds], uint8(to.appData[roundIndex])), string(abi.encodePacked("actor cannot override weight outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData[accuracyIndex])));
 
             require(uint8(to.appData[weightIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip weight");
 
@@ -154,13 +155,13 @@ contract FLApp is App {
     }
 
 
-    // check if 2 arrays are equal except for one element at index idx
-    function equalExcept(uint256[] memory a, uint256[] memory b, int idx) internal pure returns (bool) {
+    // check if 2 byte arrays are equal except for one element at index idx
+    function equalExcept(bytes memory a, bytes memory b, uint8 idx) internal pure returns (bool) {
         if (a.length != b.length) {
             return false;
         }
         for (uint i = 0; i < a.length; i++) {
-            if (int(i) == idx) {
+            if (i == idx) {
                 continue;
             }
             if (a[i] != b[i]) {
@@ -169,7 +170,6 @@ contract FLApp is App {
         }
         return true;
     }
-
 
     function requireEqualUint256ArrayArray(
         uint256[][] memory a,
