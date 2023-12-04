@@ -85,7 +85,7 @@ func main() {
 	appClient.Set(2, 3, 6, 67, 43)
 
 	log.Println("Server's turn.")
-	appServer.Set(2, 3, 5, 68, 42)
+	appServer.ForceSet(2, 3, 5, 68, 42)
 
 	// // Dispute channel state.
 	// log.Println("Server's turn.")

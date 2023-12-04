@@ -166,6 +166,10 @@ func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
 			return fmt.Errorf("actor: %v must increment round: expected %v, got %v", fromData.NextActor, fromData.Round+1, toData.Round)
 		}
 
+		if !reflect.DeepEqual(fromData.Weight, toData.Weight){
+			return fmt.Errorf("actor: %v cannot override weight: expected %v, got %v", fromData.NextActor, fromData.Weight, toData.Weight)
+		}
+
 		if !equalExcept(fromData.Accuracy[:], toData.Accuracy[:], int(fromData.Round)) {
 			return fmt.Errorf("actor: %v cannot override accuracy outside current round: expected %v, got %v", fromData.NextActor, fromData.Accuracy, toData.Accuracy)
 		}
@@ -173,7 +177,6 @@ func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
 		if fromData.RoundPhase != 0 && toData.Accuracy[fromData.Round] == 0 { //accuracy is not set
 			return fmt.Errorf("actor: %v cannot skip accuracy", fromData.NextActor)
 		}
-
 
 		if !equalExcept(fromData.Loss[:], toData.Loss[:], int(fromData.Round)) {
 			return fmt.Errorf("actor: %v cannot override loss outside current round: expected %v, got %v", fromData.NextActor, fromData.Loss, toData.Loss)

@@ -39,11 +39,8 @@ contract FLApp is App {
     uint8 constant modelIndex = 1;
     uint8 constant numberOfRoundsIndex = modelIndex + 1;
     uint8 constant roundIndex = numberOfRoundsIndex + 1;
-    uint8 constant roundPhase = roundIndex + 1;
-    uint8 constant weightIndex = roundPhase + 1;
-    uint8 constant accuracyIndex = weightIndex + rounds;
-    uint8 constant lossIndex = accuracyIndex + rounds;
-    uint8 constant appDataLength = lossIndex + rounds;
+    uint8 constant roundPhaseIndex = roundIndex + 1;
+    uint8 constant weightIndex = roundPhaseIndex + 1;
     uint8 constant threshold = 60;
 
     /**
@@ -63,23 +60,58 @@ contract FLApp is App {
         require(params.participants.length == numParts, "number of participants");
 
         uint8 actorIndex = uint8(from.appData[actorDataIndex]);
-        require(to.appData.length == appDataLength, "data length");
         require(actorIndex == signerIdx, "actor not signer");
         require((actorIndex + 1) % numParts == uint8(to.appData[actorDataIndex]), "next actor");
 
-        // Test valid action.
-        // bool changed = false;
-        // for (uint i = gridDataIndex; i < gridDataIndex + gridDataLength; i++) {
-        //     require(uint8(to.appData[i]) <= 2, "grid value");
-        //     if (to.appData[i] != from.appData[i]) {
-        //         require(uint8(from.appData[i]) == notSet, "overwrite");
-        //         require(!changed, "two actions");
-        //         changed = true;
-        //     }
-        // }
+        if (uint8(from.appData[roundPhaseIndex]) != 0){
+            require(from.appData[modelIndex] == to.appData[modelIndex], "model changed");
+            require(from.appData[numberOfRoundsIndex] == to.appData[numberOfRoundsIndex], "round changed");
+        }
+
+        uint8 numRounds = uint8(to.appData[numberOfRoundsIndex]);
+
+        uint8  accuracyIndex = weightIndex + numRounds;
+        uint8  lossIndex = accuracyIndex + numRounds;
+        uint8  appDataLength = lossIndex + numRounds;
+        require(to.appData.length == appDataLength, "data length");
+
+
+        require(uint8(from.appData[numberOfRoundsIndex]) <= uint8(to.appData[numberOfRoundsIndex]), string(abi.encodePacked("roundIndex out of bounds: ", to.appData[numberOfRoundsIndex])));
+
+
+        // check server constraints
+        if (actorIndex == 0) {
+            require(!(from.appData[roundPhaseIndex] != 0 && uint8(to.appData[roundIndex]) != uint8(from.appData[roundIndex]) + uint8(1)), string(abi.encodePacked("actor must increment round: expected ", uint8(from.appData[roundIndex]) + 1, ", got ", to.appData[roundIndex])));
+
+            require(from.appData[weightIndex+numRounds] == to.appData[weightIndex+numRounds], string(abi.encodePacked("actor cannot override weights: expected", from.appData[weightIndex+numRounds], ", got ", to.appData[weightIndex+numRounds])));
+
+            // require(!(!equalExcept(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds], int(from.appData[roundIndex]))), string(abi.encodePacked("actor cannot override accuracy outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData.accuracyIndex)));
+            if (uint8(from.appData[roundPhaseIndex]) != 0){
+                require(uint8(to.appData[accuracyIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip accuracy");
+                require(uint8(to.appData[lossIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip loss");
+            }
+            // require(!(!equalExcept(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds], int(from.appData[roundIndex]))), string(abi.encodePacked("actor cannot override loss outside current round: expected ", from.appData[lossIndex], ", got ", to.appData[lossIndex])));
+
+        }
+
+        // check client constraints
+
+        if (actorIndex == 1) {
+            require(from.appData[roundIndex] == to.appData[roundIndex], "actor cannot increment round");
+
+            require(from.appData[accuracyIndex+numRounds] == to.appData[accuracyIndex+numRounds], string(abi.encodePacked("actor cannot override accuracy: expected", from.appData[accuracyIndex+numRounds], ", got ", to.appData[accuracyIndex+numRounds])));
+
+            require(from.appData[lossIndex+numRounds] == to.appData[lossIndex+numRounds], string(abi.encodePacked("actor cannot override loss: expected", from.appData[lossIndex+numRounds], ", got ", to.appData[lossIndex+numRounds])));
+
+            // require(!(!equalExcept(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds], int(to.appData[roundIndex]))), string(abi.encodePacked("actor cannot override weight outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData[accuracyIndex])));
+
+            require(uint8(to.appData[weightIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip weight");
+
+
+        }
 
         // Test final state.
-        (bool isFinal, bool hasWinner, uint8 winner) = checkFinal(to.appData);
+        (bool isFinal, bool hasWinner, uint8 winner) = checkFinal(to.appData, accuracyIndex);
         require(to.isFinal == isFinal, "final flag");
         Array.requireEqualAddressArray(to.outcome.assets, from.outcome.assets);
         Channel.requireEqualSubAllocArray(to.outcome.locked, from.outcome.locked);
@@ -110,8 +142,8 @@ contract FLApp is App {
         }
     }
 
-    function checkFinal(bytes memory d) internal pure returns (bool isFinal, bool hasWinner, uint8 winner) {
-        if (d[weightIndex] != 0 && (d[accuracyIndex] != 0 || d[lossIndex] != 0)) {
+    function checkFinal(bytes memory d, uint8 accuracyIndex) internal pure returns (bool isFinal, bool hasWinner, uint8 winner) {
+        if (d[numberOfRoundsIndex] == d[roundIndex] && uint8(d[numberOfRoundsIndex]) == 3) {
             if (uint8(d[accuracyIndex]) >= threshold) {
                 return (true, true, 1);
             }
@@ -120,6 +152,24 @@ contract FLApp is App {
         return (false, false, 0);
 
     }
+
+
+    // check if 2 arrays are equal except for one element at index idx
+    function equalExcept(uint256[] memory a, uint256[] memory b, int idx) internal pure returns (bool) {
+        if (a.length != b.length) {
+            return false;
+        }
+        for (uint i = 0; i < a.length; i++) {
+            if (int(i) == idx) {
+                continue;
+            }
+            if (a[i] != b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     function requireEqualUint256ArrayArray(
         uint256[][] memory a,

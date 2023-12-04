@@ -98,7 +98,7 @@ func (v FieldValue) PlayerIndex() channel.Index {
 
 func (d FLAppData) CheckFinal() (isFinal bool, winner *channel.Index) {
 
-	if d.NumberOfRounds == d.Round {
+	if d.NumberOfRounds == d.Round && d.RoundPhase == uint8(3) {
 		if d.Accuracy[0] >= 60 {
 			index := makeFieldValueFromPlayerIdx(1)
 			playerIndex := index.PlayerIndex()

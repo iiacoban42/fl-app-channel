@@ -61,7 +61,7 @@ func deployContracts(nodeURL string, chainID uint64, privateKey string) (adj, ah
 		panic(err)
 	}
 
-	const gasLimit = 1100000 // Must be sufficient for deploying FL.sol.
+	const gasLimit = 30000000 // Must be sufficient for deploying FL.sol.
 	tops, err := cb.NewTransactor(context.TODO(), gasLimit, acc)
 	if err != nil {
 		panic(err)
