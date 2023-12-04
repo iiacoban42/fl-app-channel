@@ -37,12 +37,13 @@ contract FLApp is App {
     // uint8 constant firstPlayer = 1;
     // uint8 constant secondPlayer = 2;
     uint8 constant modelIndex = 1;
-    uint8 constant roundIndex = modelIndex + 1;
+    uint8 constant numberOfRoundsIndex = modelIndex + 1;
+    uint8 constant roundIndex = numberOfRoundsIndex + 1;
     uint8 constant roundPhase = roundIndex + 1;
     uint8 constant weightIndex = roundPhase + 1;
     uint8 constant accuracyIndex = weightIndex + rounds;
     uint8 constant lossIndex = accuracyIndex + rounds;
-    uint8 constant appDataLength = accuracyIndex + rounds;
+    uint8 constant appDataLength = lossIndex + rounds;
     uint8 constant threshold = 60;
 
     /**

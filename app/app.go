@@ -62,6 +62,11 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading model")
 	}
 
+	d.NumberOfRounds, err = readUInt8(r)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading numberOfRounds")
+	}
+
 	d.Round, err = readUInt8(r)
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading round")
@@ -116,6 +121,10 @@ func (a *FLApp) ValidInit(p *channel.Params, s *channel.State) error {
 
 	if appData.Model != zero.Model {
 		return fmt.Errorf("invalid starting model: %v", appData.Model)
+	}
+
+	if appData.NumberOfRounds != zero.NumberOfRounds {
+		return fmt.Errorf("invalid starting numberOfRounds: %v", appData.NumberOfRounds)
 	}
 
 	if appData.Round != zero.Round {
@@ -234,13 +243,13 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 }
 
 
-func (a *FLApp) Set(s *channel.State, model, weight, accuracy, loss int, actorIdx channel.Index) error {
+func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index) error {
 	d, ok := s.Data.(*FLAppData)
 	if !ok {
 		return fmt.Errorf("invalid data type: %T", d)
 	}
 
-	d.Set(model, weight, accuracy, loss, actorIdx)
+	d.Set(model, numberOfRounds, weight, accuracy, loss, actorIdx)
 	log.Println("\n" + d.String())
 
 	if isFinal, winner := d.CheckFinal(); isFinal {

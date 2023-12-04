@@ -30,8 +30,8 @@ const (
 
 	// Private keys.
 	keyDeployer = "79ea8f62d97bc0591a4224c1725fca6b00de5b2cea286fe2e0bb35c5e76be46e"
-	keyAlice    = "1af2e950272dd403de7a5760d41c6e44d92b6d02797e51810795ff03cc2cda4f"
-	keyBob      = "f63d7d8e930bccd74e93cf5662fde2c28fd8be95edb70c73f1bdd863d07f412e"
+	keyServer    = "1af2e950272dd403de7a5760d41c6e44d92b6d02797e51810795ff03cc2cda4f"
+	keyClient      = "f63d7d8e930bccd74e93cf5662fde2c28fd8be95edb70c73f1bdd863d07f412e"
 )
 
 // main runs a demo of the game client. It assumes that a blockchain node is
@@ -48,54 +48,60 @@ func main() {
 	log.Println("Setting up clients.")
 	bus := wire.NewLocalBus() // Message bus used for off-chain communication.
 	stake := client.EthToWei(big.NewFloat(5))
-	alice := setupGameClient(bus, chainURL, adjudicator, asset, keyAlice, app, stake)
-	bob := setupGameClient(bus, chainURL, adjudicator, asset, keyBob, app, stake)
+	server := setupGameClient(bus, chainURL, adjudicator, asset, keyServer, app, stake)
+	client := setupGameClient(bus, chainURL, adjudicator, asset, keyClient, app, stake)
 
 	// Print balances before transactions.
 	l := newBalanceLogger(chainURL)
-	l.LogBalances(alice, bob)
+	l.LogBalances(server, client)
 
 	// Open app channel and play.
 	log.Println("Opening channel.")
-	appAlice := alice.OpenAppChannel(bob.WireAddress())
-	appBob := bob.AcceptedChannel()
+	appServer := server.OpenAppChannel(client.WireAddress())
+	appClient := client.AcceptedChannel()
 
 
 	// Set(model, weight, accuracy, loss int, actorIdx channel.Index)
 	log.Println("Start playing.")
-	log.Println("Alice's turn.")
-	appAlice.Set(2, 0, 0, 0)
+	log.Println("Server's turn.")
+	// round 1
+	appServer.Set(2, 3, 0, 0, 0)
 
-	log.Println("Bob's turn.")
-	appBob.Set(2, 5, 0, 0)
+	log.Println("Client's turn.")
+	appClient.Set(2, 3, 5, 0, 0)
 
-	log.Println("Alice's turn.")
-	appAlice.Set(2, 5, 66, 44)
+	log.Println("Server's turn.")
+	appServer.Set(2, 3, 5, 66, 44)
 
-	// log.Println("Bob's turn.")
-	// appBob.Set(1, 1)
+	// round 2
+	log.Println("Client's turn.")
+	appClient.Set(2, 3, 4, 66, 44)
 
-	// log.Println("Alice's turn.")
-	// appAlice.Set(2, 2)
+	log.Println("Server's turn.")
+	appServer.Set(2, 3, 5, 67, 43)
 
-	// log.Println("Bob's turn.")
-	// appBob.Set(2, 1)
+	// round 3
+	log.Println("Client's turn.")
+	appClient.Set(2, 3, 6, 67, 43)
+
+	log.Println("Server's turn.")
+	appServer.Set(2, 3, 5, 68, 42)
 
 	// // Dispute channel state.
-	// log.Println("Alice's turn.")
-	// appAlice.ForceSet(1, 2)
+	// log.Println("Server's turn.")
+	// appServer.ForceSet(1, 2)
 
-	log.Println("Bob wins.")
+	log.Println("Client wins.")
 	log.Println("Payout.")
 
 	// Payout.
-	appAlice.Settle()
-	appBob.Settle()
+	appServer.Settle()
+	appClient.Settle()
 
 	// Print balances after transactions.
-	l.LogBalances(alice, bob)
+	l.LogBalances(server, client)
 
 	// Cleanup.
-	alice.Shutdown()
-	bob.Shutdown()
+	server.Shutdown()
+	client.Shutdown()
 }
