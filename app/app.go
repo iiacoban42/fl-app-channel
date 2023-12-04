@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"reflect"
 
 	"github.com/pkg/errors"
 
@@ -157,6 +158,72 @@ func (a *FLApp) ValidInit(p *channel.Params, s *channel.State) error {
 	return nil
 }
 
+
+func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
+
+	if fromData.NextActor == uint8(0) { // Server conditions
+		if fromData.RoundPhase != 0 && toData.Round != fromData.Round+1 {
+			return fmt.Errorf("actor: %v must increment round: expected %v, got %v", fromData.NextActor, fromData.Round+1, toData.Round)
+		}
+
+		if !equalExcept(fromData.Accuracy[:], toData.Accuracy[:], int(fromData.Round)) {
+			return fmt.Errorf("actor: %v cannot override accuracy outside current round: expected %v, got %v", fromData.NextActor, fromData.Accuracy, toData.Accuracy)
+		}
+
+		if fromData.RoundPhase != 0 && toData.Accuracy[fromData.Round] == 0 { //accuracy is not set
+			return fmt.Errorf("actor: %v cannot skip accuracy", fromData.NextActor)
+		}
+
+
+		if !equalExcept(fromData.Loss[:], toData.Loss[:], int(fromData.Round)) {
+			return fmt.Errorf("actor: %v cannot override loss outside current round: expected %v, got %v", fromData.NextActor, fromData.Loss, toData.Loss)
+		}
+
+		if fromData.RoundPhase != 0 && toData.Loss[fromData.Round] == 0{ //loss is not set
+			return fmt.Errorf("actor: %v cannot skip loss", fromData.NextActor)
+		}
+	}
+	return nil
+}
+
+func checkClientTransitionConstraints(fromData, toData *FLAppData) error {
+	if fromData.NextActor == uint8(1){ //Client conditions
+		if fromData.Round != toData.Round{
+			return fmt.Errorf("actor: %v cannot override round: expected %v, got %v", fromData.NextActor, fromData.Round, toData.Round)
+		}
+		if !reflect.DeepEqual(fromData.Accuracy, toData.Accuracy){
+			return fmt.Errorf("actor: %v cannot override accuracy: expected %v, got %v", fromData.NextActor, fromData.Accuracy, toData.Accuracy)
+		}
+		if !reflect.DeepEqual(fromData.Loss, toData.Loss){
+			return fmt.Errorf("actor: %v cannot override loss: expected %v, got %v", fromData.NextActor, fromData.Loss, toData.Loss)
+		}
+
+		if !equalExcept(fromData.Weight[:], toData.Weight[:], int(toData.Round)){
+			return fmt.Errorf("actor: %v cannot override weights outside current round: expected %v, got %v", fromData.NextActor, fromData.Weight, toData.Weight)
+		}
+
+		if toData.Weight[fromData.Round] == 0 { //weight is not set
+			return fmt.Errorf("actor: %v cannot skip weight %v -> %v", fromData.NextActor, fromData.Weight, toData.Weight)
+		}
+	}
+	return nil
+}
+
+func checkFLRoundTransitionConstraints(fromData, toData *FLAppData) error {
+	if fromData.RoundPhase != 0 && fromData.Model != toData.Model {
+		return fmt.Errorf("cannot override model: expected %v, got %v", fromData.Model, toData.Model)
+	}
+
+	if fromData.RoundPhase != 0 && fromData.NumberOfRounds != toData.NumberOfRounds {
+		return fmt.Errorf("cannot override number of rounds: expected %v, got %v", fromData.NumberOfRounds, toData.NumberOfRounds)
+	}
+
+	if toData.Round > toData.NumberOfRounds {
+		return fmt.Errorf("round out of bounds: %v", toData.Round)
+	}
+	return nil
+}
+
 // ValidTransition is called whenever the channel state transitions.
 func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State, idx channel.Index) error {
 	err := channel.AssetsAssertEqual(from.Assets, to.Assets)
@@ -188,44 +255,20 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 		return fmt.Errorf("invalid next actor: expected %v, got %v", expectedToNextActor, toData.NextActor)
 	}
 
-	// if fromData.NextActor == 0 {
-	// 	// Check model.
-	// 	if toData.Model > maxFieldValue {
-	// 		return fmt.Errorf("invalid model value: %d", toData.Model)
-	// 	}
+	var roundCheck = checkFLRoundTransitionConstraints(fromData, toData)
+	if roundCheck != nil {
+		return roundCheck
+	}
 
+	var serverCheck = checkServerTransitionConstraints(fromData, toData)
+	if serverCheck != nil {
+		return serverCheck
+	}
 
-	// Check grid.
-	// changed := false
-	// for i, v := range toData.Grid {
-	// 	if v > maxFieldValue {
-	// 		return fmt.Errorf("invalid grid value at index %d: %d", i, v)
-	// 	}
-	// 	vFrom := fromData.Grid[i]
-	// 	if v != vFrom {
-	// 		if vFrom != notSet {
-	// 			return fmt.Errorf("cannot overwrite field %d", i)
-	// 		}
-	// 		if changed {
-	// 			return fmt.Errorf("cannot change two fields")
-	// 		}
-	// 		changed = true
-	// 	}
-	// }
-	//
-	// if !changed {
-	// 	return fmt.Errorf("cannot skip turn")
-	// }
-
-	// check round inputs
-
-
-
-		// Check model.
-	// if toData.Model > maxFieldValue {
-	// 		return fmt.Errorf("invalid model value: %d", toData.Model)
-	// 	}
-
+	var clientCheck = checkClientTransitionConstraints(fromData, toData)
+	if clientCheck != nil {
+		return clientCheck
+	}
 
 	// Check final and allocation.
 	isFinal, winner := toData.CheckFinal()
@@ -260,3 +303,20 @@ func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, l
 	}
 	return nil
 }
+
+// check if 2 arrays are equal except for one element at position idx
+func equalExcept(arr1, arr2 []uint8, idx int) bool {
+	if len(arr1) != len(arr2) {
+		return false
+	}
+	for i := range arr1 {
+		if i == idx {
+			continue
+		}
+		if arr1[i] != arr2[i] {
+			return false
+		}
+	}
+	return true
+}
+
