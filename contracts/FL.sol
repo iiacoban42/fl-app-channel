@@ -19,23 +19,12 @@ pragma experimental ABIEncoderV2;
 
 import "./perun-eth-contracts/contracts/App.sol";
 
-/**
- * @notice FLApp is a channel app for playing tic tac toe.
- * The data is encoded as follows:
- * - data[0]: The index of the next actor.
- * - data[i], i in [1,10]: The value of field i. 0 means no tick, 1 means tick by player 1, 2 means tick by player 2.
- */
+
 contract FLApp is App {
     uint8 constant actorDataIndex = 0;
     uint8 constant actorDataLength = 1;
-
-    // uint8 constant gridDataIndex = actorDataIndex + actorDataLength;
-    uint8 constant rounds = 1;
-    // uint8 constant appDataLength = gridDataIndex + gridDataLength; // Actor index + grid.
     uint8 constant numParts = 2;
-    // uint8 constant notSet = 0;
-    // uint8 constant firstPlayer = 1;
-    // uint8 constant secondPlayer = 2;
+
     uint8 constant modelIndex = 1;
     uint8 constant numberOfRoundsIndex = modelIndex + 1;
     uint8 constant roundIndex = numberOfRoundsIndex + 1;
@@ -70,26 +59,29 @@ contract FLApp is App {
 
         uint8 numRounds = uint8(to.appData[numberOfRoundsIndex]);
 
-        uint8  accuracyIndex = weightIndex + numRounds;
-        uint8  lossIndex = accuracyIndex + numRounds;
-        uint8  appDataLength = lossIndex + numRounds;
+        uint8 accuracyIndex = weightIndex + numRounds;
+        uint8 lossIndex = accuracyIndex + numRounds;
+        uint8 appDataLength = lossIndex + numRounds;
+
         require(to.appData.length == appDataLength, "data length");
 
+        require(uint8(to.appData[roundIndex]) <= uint8(to.appData[numberOfRoundsIndex]), "round out of bounds");
 
-        require(uint8(from.appData[numberOfRoundsIndex]) <= uint8(to.appData[numberOfRoundsIndex]), string(abi.encodePacked("roundIndex out of bounds: ", to.appData[numberOfRoundsIndex])));
 
-
-        // check server constraints
+        // // check server constraints
         if (actorIndex == 0) {
-            require(!(from.appData[roundPhaseIndex] != 0 && uint8(to.appData[roundIndex]) != uint8(from.appData[roundIndex]) + uint8(1)), string(abi.encodePacked("actor must increment round: expected ", uint8(from.appData[roundIndex]) + 1, ", got ", to.appData[roundIndex])));
+            require(equalBytes(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds]), "actor cannot override weights");
 
-            require(from.appData[weightIndex+numRounds] == to.appData[weightIndex+numRounds], string(abi.encodePacked("actor cannot override weights: expected", from.appData[weightIndex+numRounds], ", got ", to.appData[weightIndex+numRounds])));
+            require(equalExcept(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds], uint8(from.appData[roundIndex])), "actor cannot override accuracy outside current round");
 
-            require(equalExcept(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds], uint8(from.appData[roundIndex])), string(abi.encodePacked("actor cannot override accuracy outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData[accuracyIndex])));
-            require(equalExcept(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds], uint8(from.appData[roundIndex])), string(abi.encodePacked("actor cannot override loss outside current round: expected ", from.appData[lossIndex], ", got ", to.appData[lossIndex])));
+            require(equalExcept(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds], uint8(from.appData[roundIndex])), "actor cannot override loss outside current round ");
 
-            if (uint8(from.appData[roundPhaseIndex]) != 0){
+
+            if (uint8(from.appData[roundPhaseIndex]) != 0){ // unless we are in init phase
+                require(uint8(to.appData[roundIndex]) == uint8(from.appData[roundIndex]) + uint8(1), "actor must increment round");
+
                 require(uint8(to.appData[accuracyIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip accuracy");
+
                 require(uint8(to.appData[lossIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip loss");
             }
 
@@ -98,17 +90,15 @@ contract FLApp is App {
         // check client constraints
 
         if (actorIndex == 1) {
-            require(from.appData[roundIndex] == to.appData[roundIndex], "actor cannot increment round");
+            require(uint8(from.appData[roundIndex]) == uint8(to.appData[roundIndex]), "actor cannot increment round");
 
-            require(from.appData[accuracyIndex+numRounds] == to.appData[accuracyIndex+numRounds], string(abi.encodePacked("actor cannot override accuracy: expected", from.appData[accuracyIndex+numRounds], ", got ", to.appData[accuracyIndex+numRounds])));
+            require(equalBytes(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds]), "actor cannot override accuracy");
 
-            require(from.appData[lossIndex+numRounds] == to.appData[lossIndex+numRounds], string(abi.encodePacked("actor cannot override loss: expected", from.appData[lossIndex+numRounds], ", got ", to.appData[lossIndex+numRounds])));
+            require(equalBytes(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds]), "actor cannot override loss");
 
-            require(equalExcept(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds], uint8(to.appData[roundIndex])), string(abi.encodePacked("actor cannot override weight outside current round: expected ", from.appData[accuracyIndex], ", got ", to.appData[accuracyIndex])));
+            require(equalExcept(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds], uint8(to.appData[roundIndex])), "actor cannot override weight outside current round");
 
             require(uint8(to.appData[weightIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip weight");
-
-
         }
 
         // Test final state.
@@ -164,6 +154,18 @@ contract FLApp is App {
             if (i == idx) {
                 continue;
             }
+            if (a[i] != b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function equalBytes(bytes memory a, bytes memory b) internal pure returns (bool) {
+        if (a.length != b.length) {
+            return false;
+        }
+        for (uint i = 0; i < a.length; i++) {
             if (a[i] != b[i]) {
                 return false;
             }

@@ -65,24 +65,24 @@ func main() {
 	log.Println("Start playing.")
 	log.Println("Server's turn.")
 	// round 1
-	appServer.Set(2, 3, 0, 0, 0)
+	appServer.ForceSet(2, 3, 0, 0, 0)
 
 	log.Println("Client's turn.")
-	appClient.Set(2, 3, 5, 0, 0)
+	appClient.ForceSet(2, 3, 5, 0, 0)
 
 	log.Println("Server's turn.")
-	appServer.Set(2, 3, 5, 66, 44)
+	appServer.ForceSet(2, 3, 5, 66, 44)
 
 	// round 2
 	log.Println("Client's turn.")
-	appClient.Set(2, 3, 4, 66, 44)
+	appClient.ForceSet(2, 3, 4, 66, 44)
 
 	log.Println("Server's turn.")
-	appServer.Set(2, 3, 5, 67, 43)
+	appServer.ForceSet(2, 3, 5, 67, 43)
 
 	// round 3
 	log.Println("Client's turn.")
-	appClient.Set(2, 3, 6, 67, 43)
+	appClient.ForceSet(2, 3, 6, 67, 43)
 
 	log.Println("Server's turn.")
 	appServer.ForceSet(2, 3, 5, 68, 42)
