@@ -61,31 +61,30 @@ func main() {
 	appClient := client.AcceptedChannel()
 
 
-	// Set(model, weight, accuracy, loss int, actorIdx channel.Index)
+	// Set(model, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index)
 	log.Println("Start playing.")
-	log.Println("Server's turn.")
 	// round 1
-	appServer.ForceSet(2, 3, 0, 0, 0)
+	appServer.Set(2, 3, 0, 0, 0)
 
 	log.Println("Client's turn.")
-	appClient.ForceSet(2, 3, 5, 0, 0)
+	appClient.Set(2, 3, 5, 0, 0)
 
 	log.Println("Server's turn.")
-	appServer.ForceSet(2, 3, 5, 66, 44)
+	appServer.Set(2, 3, 5, 66, 44)
 
 	// round 2
 	log.Println("Client's turn.")
-	appClient.ForceSet(2, 3, 4, 66, 44)
+	appClient.Set(2, 3, 4, 66, 44)
 
 	log.Println("Server's turn.")
-	appServer.ForceSet(2, 3, 5, 67, 43)
+	appServer.Set(2, 3, 5, 67, 43)
 
 	// round 3
 	log.Println("Client's turn.")
-	appClient.ForceSet(2, 3, 6, 67, 43)
+	appClient.Set(2, 3, 6, 67, 43)
 
 	log.Println("Server's turn.")
-	appServer.ForceSet(2, 3, 5, 68, 42)
+	appServer.Set(2, 3, 5, 68, 42)
 
 	// // Dispute channel state.
 	// log.Println("Server's turn.")

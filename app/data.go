@@ -116,6 +116,7 @@ func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actor
 	} else if d.RoundPhase == 1 { //update then waiting for aggregation
 		d.Weight[d.Round] = uint8safe(uint16(weight))
 		d.RoundPhase = 2
+
 	}else if d.RoundPhase == 2 { // aggregate then waiting for updates
 		d.Accuracy[d.Round] = uint8safe(uint16(accuracy))
 		d.Loss[d.Round] = uint8safe(uint16(loss))
@@ -128,6 +129,7 @@ func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actor
 			panic("invalid round")
 		}
 		d.Round = uint8safe(uint16(d.Round + 1))
+		
 	} else if d.RoundPhase == 3 { //waiting for termination
 		fmt.Printf("waiting for termination")
 		d.RoundPhase = 4

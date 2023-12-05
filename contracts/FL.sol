@@ -88,7 +88,6 @@ contract FLApp is App {
         }
 
         // check client constraints
-
         if (actorIndex == 1) {
             require(uint8(from.appData[roundIndex]) == uint8(to.appData[roundIndex]), "actor cannot increment round");
 

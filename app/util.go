@@ -68,33 +68,12 @@ func (v FieldValue) PlayerIndex() channel.Index {
 	}
 }
 
-// func (d FLAppData) CheckFinal() (isFinal bool, winner *channel.Index) {
-// 	// 0 1 2
-// 	// 3 4 5
-// 	// 6 7 8
-
-// 	// Check winner.
-// 	v := [][]int{
-// 		{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // rows
-// 		{0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // columns
-// 		{0, 4, 8}, {2, 4, 6}, // diagonals
-// 	}
-
-// 	for _, _v := range v {
-// 		ok, idx := d.samePlayer(_v...)
-// 		if ok {
-// 			return true, &idx
-// 		}
-// 	}
-
-// 	// Check all set.
-// 	for _, v := range d.Grid {
-// 		if v != notSet {
-// 			return false, nil
-// 		}
-// 	}
-// 	return true, nil
-// }
+func (d FLAppData) checkClientReward() bool {
+	if d.RoundPhase == uint8(2){
+		return true
+	}
+	return false
+}
 
 func (d FLAppData) CheckFinal() (isFinal bool, winner *channel.Index) {
 
@@ -111,24 +90,6 @@ func (d FLAppData) CheckFinal() (isFinal bool, winner *channel.Index) {
 
 	return false, nil
 }
-
-
-// func (d FLAppData) samePlayer(gridIndices ...int) (ok bool, player channel.Index) {
-// 	if len(gridIndices) < 2 {
-// 		panic("expecting at least two inputs")
-// 	}
-
-// 	first := d.Grid[gridIndices[0]]
-// 	if first == notSet {
-// 		return false, 0
-// 	}
-// 	for _, i := range gridIndices {
-// 		if d.Grid[i] != first {
-// 			return false, 0
-// 		}
-// 	}
-// 	return true, 0
-// }
 
 func uint8safe(a uint16) uint8 {
 	b := uint8(a)
@@ -208,4 +169,34 @@ func computeFinalBalances(bals channel.Balances, winner channel.Index) channel.B
 		finalBals[i][loser] = big.NewInt(0)
 	}
 	return finalBals
+}
+
+func payCLientForContrib(bals channel.Balances) channel.Balances {
+
+	contribFee := int64(1000000000000000000)
+	client := 1
+	server := 0
+	newBals := bals.Clone()
+	for i := range newBals {
+		fmt.Println("newBals[i][client]: ", newBals[i][client])
+		newBals[i][client] = new(big.Int).Add(bals[i][client], big.NewInt(contribFee))
+		newBals[i][server] = new(big.Int).Sub(bals[i][server], big.NewInt(contribFee))
+	}
+	return newBals
+}
+
+// check if 2 arrays are equal except for one element at position idx
+func equalExcept(arr1, arr2 []uint8, idx int) bool {
+	if len(arr1) != len(arr2) {
+		return false
+	}
+	for i := range arr1 {
+		if i == idx {
+			continue
+		}
+		if arr1[i] != arr2[i] {
+			return false
+		}
+	}
+	return true
 }

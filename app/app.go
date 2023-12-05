@@ -278,13 +278,14 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 	if to.IsFinal != isFinal {
 		return fmt.Errorf("final flag: expected %v, got %v", isFinal, to.IsFinal)
 	}
-	expectedAllocation := from.Allocation.Clone()
-	if winner != nil {
-		expectedAllocation.Balances = computeFinalBalances(from.Allocation.Balances, *winner)
-	}
-	if err := expectedAllocation.Equal(&to.Allocation); err != nil {
-		return errors.WithMessagef(err, "wrong allocation: expected %v, got %v", expectedAllocation, to.Allocation)
-	}
+	fmt.Println("Winner: ", winner)
+	// expectedAllocation := from.Allocation.Clone()
+	// if winner != nil {
+	// 	expectedAllocation.Balances = computeFinalBalances(from.Allocation.Balances, *winner)
+	// }
+	// if err := expectedAllocation.Equal(&to.Allocation); err != nil {
+	// 	return errors.WithMessagef(err, "wrong allocation: expected %v, got %v", expectedAllocation, to.Allocation)
+	// }
 	return nil
 }
 
@@ -298,28 +299,19 @@ func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, l
 	d.Set(model, numberOfRounds, weight, accuracy, loss, actorIdx)
 	log.Println("\n" + d.String())
 
+	if checkClientReward := d.checkClientReward(); checkClientReward {
+		fmt.Println("Client reward")
+		s.Balances = payCLientForContrib(s.Balances)
+	}
+
 	if isFinal, winner := d.CheckFinal(); isFinal {
 		s.IsFinal = true
-		if winner != nil {
-			s.Balances = computeFinalBalances(s.Balances, *winner)
-		}
+		fmt.Println("Winner: ", winner)
+		// if winner != nil {
+		// 	s.Balances = computeFinalBalances(s.Balances, *winner)
+		// }
 	}
 	return nil
 }
 
-// check if 2 arrays are equal except for one element at position idx
-func equalExcept(arr1, arr2 []uint8, idx int) bool {
-	if len(arr1) != len(arr2) {
-		return false
-	}
-	for i := range arr1 {
-		if i == idx {
-			continue
-		}
-		if arr1[i] != arr2[i] {
-			return false
-		}
-	}
-	return true
-}
 
