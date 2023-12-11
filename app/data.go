@@ -129,7 +129,7 @@ func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actor
 			panic("invalid round")
 		}
 		d.Round = uint8safe(uint16(d.Round + 1))
-		
+
 	} else if d.RoundPhase == 3 { //waiting for termination
 		fmt.Printf("waiting for termination")
 		d.RoundPhase = 4

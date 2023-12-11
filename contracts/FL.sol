@@ -101,20 +101,31 @@ contract FLApp is App {
         }
 
         // Test final state.
-        (bool isFinal, bool hasWinner, uint8 winner) = checkFinal(to.appData, accuracyIndex);
+        (bool isFinal) = checkFinal(to.appData);
         require(to.isFinal == isFinal, "final flag");
         Array.requireEqualAddressArray(to.outcome.assets, from.outcome.assets);
         Channel.requireEqualSubAllocArray(to.outcome.locked, from.outcome.locked);
         uint256[][] memory expectedBalances = from.outcome.balances;
-        if (hasWinner) {
-            uint8 loser = 1 - winner;
-            expectedBalances = new uint256[][](expectedBalances.length);
-            for (uint i = 0; i < expectedBalances.length; i++) {
-                expectedBalances[i] = new uint256[](numParts);
-                expectedBalances[i][winner] = from.outcome.balances[i][0] + from.outcome.balances[i][1];
-                expectedBalances[i][loser] = 0;
+        // if (hasWinner) {
+        //     uint8 loser = 1 - winner;
+        //     expectedBalances = new uint256[][](expectedBalances.length);
+        //     for (uint i = 0; i < expectedBalances.length; i++) {
+        //         expectedBalances[i] = new uint256[](numParts);
+        //         expectedBalances[i][winner] = from.outcome.balances[i][0] + from.outcome.balances[i][1];
+        //         expectedBalances[i][loser] = 0;
+        //     }
+        // }
+
+        if (checkClientReward(to.appData)) {
+            uint256 contribFee = uint256(1000000000000000000);
+            uint8 client = 1;
+            uint8 server = 0;
+            for (uint i = 0; i < expectedBalances.length; i++){
+                expectedBalances[i][client] = from.outcome.balances[i][client] + contribFee;
+                expectedBalances[i][server] = from.outcome.balances[i][server] - contribFee;
             }
         }
+
         requireEqualUint256ArrayArray(to.outcome.balances, expectedBalances);
     }
 
@@ -132,15 +143,19 @@ contract FLApp is App {
         }
     }
 
-    function checkFinal(bytes memory d, uint8 accuracyIndex) internal pure returns (bool isFinal, bool hasWinner, uint8 winner) {
+    function checkFinal(bytes memory d) internal pure returns (bool isFinal) {
         if (d[numberOfRoundsIndex] == d[roundIndex] && uint8(d[numberOfRoundsIndex]) == 3) {
-            if (uint8(d[accuracyIndex]) >= threshold) {
-                return (true, true, 1);
-            }
-                return (true, true, 0);
+                return true;
         }
-        return (false, false, 0);
+        return false;
 
+    }
+
+    function checkClientReward(bytes memory d) internal pure returns (bool isRewarded) { // check if client is rewarded
+        if (uint8(d[roundPhaseIndex]) == uint8(2) && uint8(d[roundIndex]) != uint8(0)) {
+            return true;
+        }
+        return false;
     }
 
 

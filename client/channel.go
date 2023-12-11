@@ -28,7 +28,7 @@ func (g *FLChannel) Set(model, numberOfRounds, weight, accuracy, loss int) {
 			return fmt.Errorf("invalid app type: %T", app)
 		}
 
-		return app.Set(state, model, numberOfRounds, weight, accuracy, loss, g.ch.Idx())
+ 		return app.Set(state, model, numberOfRounds, weight, accuracy, loss, g.ch.Idx())
 	})
 	if err != nil {
 		panic(err) // We panic on error to keep the code simple.

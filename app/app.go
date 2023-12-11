@@ -274,11 +274,10 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 	}
 
 	// Check final and allocation.
-	isFinal, winner := toData.CheckFinal()
+	isFinal, _ := toData.CheckFinal()
 	if to.IsFinal != isFinal {
 		return fmt.Errorf("final flag: expected %v, got %v", isFinal, to.IsFinal)
 	}
-	fmt.Println("Winner: ", winner)
 	// expectedAllocation := from.Allocation.Clone()
 	// if winner != nil {
 	// 	expectedAllocation.Balances = computeFinalBalances(from.Allocation.Balances, *winner)
@@ -304,9 +303,8 @@ func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, l
 		s.Balances = payCLientForContrib(s.Balances)
 	}
 
-	if isFinal, winner := d.CheckFinal(); isFinal {
+	if isFinal, _ := d.CheckFinal(); isFinal {
 		s.IsFinal = true
-		fmt.Println("Winner: ", winner)
 		// if winner != nil {
 		// 	s.Balances = computeFinalBalances(s.Balances, *winner)
 		// }

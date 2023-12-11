@@ -69,7 +69,7 @@ func (v FieldValue) PlayerIndex() channel.Index {
 }
 
 func (d FLAppData) checkClientReward() bool {
-	if d.RoundPhase == uint8(2){
+	if d.RoundPhase == uint8(2) && d.Weight[d.Round] != uint8(0) {
 		return true
 	}
 	return false
