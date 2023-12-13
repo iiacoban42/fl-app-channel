@@ -18,8 +18,8 @@ import (
 	"github.com/pkg/errors"
 
 	_ "perun.network/go-perun/backend/ethereum" // backend init
-	echannel "perun.network/go-perun/backend/ethereum/channel"
-	ewallet "perun.network/go-perun/backend/ethereum/wallet"
+	ethchannel "perun.network/go-perun/backend/ethereum/channel"
+	ethwallet "perun.network/go-perun/backend/ethereum/wallet"
 	phd "perun.network/go-perun/backend/ethereum/wallet/hd"
 	"perun.network/go-perun/channel"
 	"perun.network/go-perun/client"
@@ -28,6 +28,7 @@ import (
 	"perun.network/go-perun/wire"
 	wirenet "perun.network/go-perun/wire/net"
 	"perun.network/go-perun/wire/net/simple"
+
 )
 
 type peer struct {
@@ -56,8 +57,9 @@ type node struct {
 	asset       channel.Asset
 	assetAddr   common.Address
 	funder      channel.Funder
+	appAddr     common.Address
 	// Needed to deploy contracts.
-	cb echannel.ContractBackend
+	cb ethchannel.ContractBackend
 
 	// Protects peers
 	mtx   sync.Mutex
@@ -68,7 +70,7 @@ func getOnChainBal(ctx context.Context, addrs ...wallet.Address) ([]*big.Int, er
 	bals := make([]*big.Int, len(addrs))
 	var err error
 	for idx, addr := range addrs {
-		bals[idx], err = ethereumBackend.BalanceAt(ctx, ewallet.AsEthAddr(addr), nil)
+		bals[idx], err = ethereumBackend.BalanceAt(ctx, ethwallet.AsEthAddr(addr), nil)
 		if err != nil {
 			return nil, errors.Wrap(err, "querying on-chain balance")
 		}

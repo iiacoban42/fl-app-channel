@@ -7,7 +7,3 @@ peers:
     perunID: 0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
     hostname: peer_1
     port: 5751
-  peer_2:
-    perunID: 0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
-    hostname: peer_2
-    port: 5752

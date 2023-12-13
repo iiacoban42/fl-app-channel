@@ -4,7 +4,7 @@ services:
     container_name: ganache
     image: trufflesuite/ganache-cli:latest
     command: ganache-cli -m "pistol kiwi shrug future ozone ostrich match remove crucial
-      oblige cream critic" --block-time 5 -e 1000
+      oblige cream critic" --block-time 5 -e 1000 --gasLimit=9000000000000000
     ports:
     - 8545:8545
     networks:
@@ -39,21 +39,6 @@ services:
     networks:
       perun-net:
         ipv4_address: 172.18.0.4
-  peer_2:
-    container_name: peer_2
-    hostname: peer_2
-    build: .
-    tty: true
-    command: sh -c "./wait-for-it.sh peer_0:5750 &&./app-channel demo --config config/peer_2.yaml"
-    ports:
-    - 5752:5752
-    restart: unless-stopped
-    depends_on:
-    - ganache
-    - peer_0
-    networks:
-      perun-net:
-        ipv4_address: 172.18.0.5
 networks:
   perun-net:
     driver: bridge

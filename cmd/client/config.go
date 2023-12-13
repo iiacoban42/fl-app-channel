@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	ewallet "perun.network/go-perun/backend/ethereum/wallet"
+	ethwallet "perun.network/go-perun/backend/ethereum/wallet"
 	"perun.network/go-perun/wallet"
 	"perun.network/go-perun/wire"
 )
@@ -84,6 +84,8 @@ type chainConfig struct {
 	adjudicator     common.Address      //
 	Assetholder     string              // address of asset holder contract
 	assetholder     common.Address      //
+	App 		    string              // address of app contract
+	app 		    common.Address      //
 	URL             string              // URL the endpoint of your ethereum node / infura eg: ws://10.70.5.70:8546
 	ID              int64               // Chain ID
 }
@@ -137,6 +139,13 @@ func SetConfig() {
 		}
 	}
 
+	if len(config.Chain.App) > 0 {
+		if config.Chain.app, err = stringToAddress(config.Chain.App); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+
 	for _, peer := range config.Peers {
 		addr, err := strToAddress(peer.PerunID)
 		if err != nil {
@@ -154,5 +163,5 @@ func stringToAddress(s string) (common.Address, error) {
 		return common.Address{}, err
 	}
 
-	return ewallet.AsEthAddr(walletAddr), nil
+	return ethwallet.AsEthAddr(walletAddr), nil
 }

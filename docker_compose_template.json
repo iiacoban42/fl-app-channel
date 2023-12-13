@@ -4,7 +4,7 @@
       "ganache": {
         "container_name": "ganache",
         "image": "trufflesuite/ganache-cli:latest",
-        "command": "ganache-cli -m \"pistol kiwi shrug future ozone ostrich match remove crucial oblige cream critic\" --block-time 5 -e 1000",
+        "command": "ganache-cli -m \"pistol kiwi shrug future ozone ostrich match remove crucial oblige cream critic\" --block-time 5 -e 1000 --gasLimit=9000000000000000",
         "ports": [
           "8545:8545"
         ],
