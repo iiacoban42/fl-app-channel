@@ -29,9 +29,9 @@ func newFLChannel(ch *client.Channel) *FLChannel {
 }
 
 
-func stateBals(state *channel.State) []channel.Bal {
-	return state.Balances[0]
-}
+// func stateBals(state *channel.State) []channel.Bal {
+// 	return state.Balances[0]
+// }
 
 // Set sends a game move to the channel peer.
 func (g *FLChannel) Set(model, numberOfRounds, weight, accuracy, loss int) {

@@ -15,7 +15,6 @@
 package client
 
 import (
-	"fmt"
 	"math/big"
 	"perun.network/go-perun/wire"
 
@@ -69,8 +68,4 @@ func WeiToEth(weiAmount *big.Int) (ethAmount *big.Float) {
 	weiPerEthFloat := new(big.Float).SetInt(weiPerEth)
 	weiAmountFloat := new(big.Float).SetInt(weiAmount)
 	return new(big.Float).Quo(weiAmountFloat, weiPerEthFloat)
-}
-
-func PrintfAsync(format string, a ...interface{}) {
-	fmt.Printf("\r"+format+"> ", a...)
 }
