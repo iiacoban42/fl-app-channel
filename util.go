@@ -22,8 +22,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethwallet "perun.network/go-perun/backend/ethereum/wallet"
 
-	"perun.network/perun-examples/app-channel/app"
-	"perun.network/perun-examples/app-channel/contracts/generated/FLApp"
+	"perun.network/perun-examples/app-channel/cmd/app"
+	"perun.network/perun-examples/app-channel/cmd/contracts/generated/FLApp"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
@@ -33,7 +33,7 @@ import (
 	swallet "perun.network/go-perun/backend/ethereum/wallet/simple"
 	"perun.network/go-perun/channel"
 	"perun.network/go-perun/wire"
-	"perun.network/perun-examples/app-channel/client"
+	"perun.network/perun-examples/app-channel/cmd/client"
 )
 
 // deployContracts deploys the contracts on the specified ledger.
@@ -143,3 +143,4 @@ func (l balanceLogger) LogBalances(clients ...*client.AppClient) {
 	}
 	log.Println("Client balances (ETH):", bals)
 }
+

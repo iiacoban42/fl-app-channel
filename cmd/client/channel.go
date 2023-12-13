@@ -6,21 +6,34 @@ import (
 
 	"perun.network/go-perun/channel"
 	"perun.network/go-perun/client"
-	"perun.network/perun-examples/app-channel/app"
+	"perun.network/perun-examples/app-channel/cmd/app"
+	"perun.network/go-perun/log"
+
 )
 
 // FLChannel is a wrapper for a Perun channel for the Tic-tac-toe app use case.
 type FLChannel struct {
 	ch *client.Channel
+	log     log.Logger
+	// save the last state to circumvent the `channel.StateMtxd` problem
+	lastState *channel.State
 }
 
 // newFLChannel creates a new tic-tac-toe app channel.
 func newFLChannel(ch *client.Channel) *FLChannel {
-	return &FLChannel{ch: ch}
+	return &FLChannel{
+		ch: 	   ch,
+		log:       log.WithField("channel", ch.ID()),
+		lastState: ch.State(),
+	}
+}
+
+
+func stateBals(state *channel.State) []channel.Bal {
+	return state.Balances[0]
 }
 
 // Set sends a game move to the channel peer.
-
 func (g *FLChannel) Set(model, numberOfRounds, weight, accuracy, loss int) {
 	err := g.ch.UpdateBy(context.TODO(), func(state *channel.State) error {
 		app, ok := state.App.(*app.FLApp)

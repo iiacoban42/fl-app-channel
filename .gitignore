@@ -1,2 +1,2 @@
 # ignore compiler output files
-contracts/abi
+*/contracts/abi

@@ -20,8 +20,8 @@ import (
 
 	ethwallet "perun.network/go-perun/backend/ethereum/wallet"
 	"perun.network/go-perun/wire"
-	"perun.network/perun-examples/app-channel/app"
-	"perun.network/perun-examples/app-channel/client"
+	"perun.network/perun-examples/app-channel/cmd/app"
+	"perun.network/perun-examples/app-channel/cmd/client"
 )
 
 const (
@@ -42,14 +42,16 @@ func main() {
 	log.Println("Deploying contracts.")
 	adjudicator, assetHolder, appAddress := deployContracts(chainURL, chainID, keyDeployer)
 	asset := *ethwallet.AsWalletAddr(assetHolder)
-	app := app.NewFLApp(ethwallet.AsWalletAddr(appAddress))
+	app1 := app.NewFLApp(ethwallet.AsWalletAddr(appAddress))
+	app2 := app.NewFLApp(ethwallet.AsWalletAddr(appAddress))
+
 
 	// Setup clients.
 	log.Println("Setting up clients.")
 	bus := wire.NewLocalBus() // Message bus used for off-chain communication.
 	stake := client.EthToWei(big.NewFloat(5))
-	server := setupGameClient(bus, chainURL, adjudicator, asset, keyServer, app, stake)
-	client := setupGameClient(bus, chainURL, adjudicator, asset, keyClient, app, stake)
+	server := setupGameClient(bus, chainURL, adjudicator, asset, keyServer, app1, stake)
+	client := setupGameClient(bus, chainURL, adjudicator, asset, keyClient, app2, stake)
 
 	// Print balances before transactions.
 	l := newBalanceLogger(chainURL)
