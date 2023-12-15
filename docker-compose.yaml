@@ -29,13 +29,12 @@ services:
     hostname: peer_1
     build: .
     tty: true
-    command: sh -c "./wait-for-it.sh peer_0:5750 &&./app-channel demo --config config/peer_1.yaml"
+    command: sh -c "./wait-for-it.sh ganache:8545 &&./app-channel demo --config config/peer_1.yaml"
     ports:
     - 5751:5751
     restart: unless-stopped
     depends_on:
     - ganache
-    - peer_0
     networks:
       perun-net:
         ipv4_address: 172.18.0.4

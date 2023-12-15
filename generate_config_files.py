@@ -109,10 +109,10 @@ def generate_docker_compose_file(network, subnet, min_ip, max_ip):
         peer_config["depends_on"] = ["ganache"]
         peer_config["command"] = f'sh -c "./wait-for-it.sh ganache:8545 &&./app-channel demo --config config/{peer}.yaml"'
         # Add dependency on peer_0 if it is not peer_0
-        if peer != "peer_0":
-            peer_config["depends_on"].append("peer_0")
-            peer_0_port = network["peers"]["peer_0"]["port"]
-            peer_config["command"] = f'sh -c "./wait-for-it.sh peer_0:{peer_0_port} &&./app-channel demo --config config/{peer}.yaml"'
+        # if peer != "peer_0":
+        #     peer_config["depends_on"].append("peer_0")
+        #     peer_0_port = network["peers"]["peer_0"]["port"]
+        #     peer_config["command"] = f'sh -c "./wait-for-it.sh peer_0:{peer_0_port} &&./app-channel demo --config config/{peer}.yaml"'
 
         peer_config["networks"]["perun-net"]["ipv4_address"] = str(peer_ip)
         # Add the peer to the config file
