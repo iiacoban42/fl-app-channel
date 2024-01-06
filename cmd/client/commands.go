@@ -44,11 +44,21 @@ func init() {
 			"Open a payment channel with the given peer and balances. The first value is the own balance and the second value is the peers balance. It is only possible to open one channel per peer.\nExample: open alice 10 10",
 			func(args []string) error { return backend.Open(args) },
 		}, {
-			"send",
-			[]argument{{"Peer", valPeer}, {"Amount", valBal}},
-			"Send a payment with amount to a given peer over the established channel.\nExample: send alice 5",
-			func(args []string) error { return backend.Send(args) },
+			"set",
+			[]argument{{"Peer", valAlias}, {"Model", valString}, {"Number of Rounds", valString}, {"Weight", valString}, {"Accuracy", valString}, {"Loss", valString}},
+			"Set channel state set client 2 3 0 0 0",
+			func(args []string) error { return backend.Set(args) },
 		}, {
+			"forceset",
+			[]argument{{"Peer", valAlias}, {"Model", valString}, {"Number of Rounds", valString}, {"Weight", valString}, {"Accuracy", valString}, {"Loss", valString}},
+			"ForceSet channel state set client 2 3 0 0 0",
+			func(args []string) error { return backend.ForceSet(args) },
+		}, {
+		// 	"send",
+		// 	[]argument{{"Peer", valPeer}, {"Amount", valBal}},
+		// 	"Send a payment with amount to a given peer over the established channel.\nExample: send alice 5",
+		// 	func(args []string) error { return backend.Send(args) },
+		// }, {
 			"close",
 			[]argument{{"Peer", valPeer}},
 			"Close a the channel with the given peer. This will push the latest state to the block chain.\nExample: close alice",
@@ -64,11 +74,11 @@ func init() {
 			"Print information about funds, peers, and channels.",
 			func(args []string) error { return backend.Info(args) },
 		}, {
-			"benchmark",
-			[]argument{{"Peer", valPeer}, {"amount", valUInt}, {"txCount", valUInt}},
-			"Performs a benchmark with the given peer by sending amount ETH in txCount micro transactions. Must have an open channel with the peer.",
-			func(args []string) error { return backend.Benchmark(args) },
-		}, {
+		// 	"benchmark",
+		// 	[]argument{{"Peer", valPeer}, {"amount", valUInt}, {"txCount", valUInt}},
+		// 	"Performs a benchmark with the given peer by sending amount ETH in txCount micro transactions. Must have an open channel with the peer.",
+		// 	func(args []string) error { return backend.Benchmark(args) },
+		// }, {
 			"help",
 			nil,
 			"Prints all possible commands.",

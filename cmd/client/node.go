@@ -29,12 +29,13 @@ import (
 	wirenet "perun.network/go-perun/wire/net"
 	"perun.network/go-perun/wire/net/simple"
 
+	"perun.network/perun-examples/app-channel/cmd/app"
 )
 
 type peer struct {
 	alias   string
 	perunID wire.Address
-	ch      *paymentChannel
+	ch      *FLChannel
 	log     log.Logger
 }
 
@@ -58,6 +59,11 @@ type node struct {
 	assetAddr   common.Address
 	funder      channel.Funder
 	appAddr     common.Address
+
+	// App client
+	stake       channel.Bal    // The amount we put at stake.
+	app         *app.FLApp     // The app definition.
+
 	// Needed to deploy contracts.
 	cb ethchannel.ContractBackend
 
@@ -138,7 +144,7 @@ func (n *node) setupChannel(ch *client.Channel) {
 		return
 	}
 
-	p.ch = newPaymentChannel(ch)
+	p.ch = newFLChannel(ch)
 
 	// Start watching.
 	go func() {
@@ -165,7 +171,7 @@ func (n *node) HandleAdjudicatorEvent(e channel.AdjudicatorEvent) {
 				// already be removed and we return.
 				return
 			}
-			peer := n.channelPeer(ch.Channel)
+			peer := n.channelPeer(ch.ch)
 			if err := n.settle(peer); err != nil {
 				PrintfAsync("🎭 error while settling: %v\n", err)
 			}
@@ -207,17 +213,25 @@ func (n *node) HandleUpdate(_ *channel.State, update client.ChannelUpdate, resp 
 	log := n.log.WithField("channel", update.State.ID)
 	log.Debug("Channel update")
 
-	ch := n.channel(update.State.ID)
-	if ch == nil {
-		log.Error("Channel for ID not found")
-		return
+	// ch := n.channel(update.State.ID)
+	// if ch == nil {
+	// 	log.Error("Channel for ID not found")
+	// 	return
+	// }
+	// ch.ch.Handle(update, resp)
+
+	ctx, cancel := context.WithTimeout(context.Background(), config.Node.HandleTimeout)
+	defer cancel()
+
+	err := resp.Accept(ctx)
+	if err != nil {
+		panic(err)
 	}
-	ch.Handle(update, resp)
 }
 
-func (n *node) channel(id channel.ID) *paymentChannel {
+func (n *node) channel(id channel.ID) *FLChannel {
 	for _, p := range n.peers {
-		if p.ch != nil && p.ch.ID() == id {
+		if p.ch != nil && p.ch.ch.ID() == id {
 			return p.ch
 		}
 	}
@@ -265,26 +279,29 @@ func (n *node) HandleProposal(prop client.ChannelProposal, res *client.ProposalR
 	bals := weiToEther(req.InitBals.Balances[0]...)
 	theirBal := bals[0] // proposer has index 0
 	ourBal := bals[1]   // proposal receiver has index 1
-	msg := fmt.Sprintf("🔁 Incoming channel proposal from %v with funding [My: %v Ξ, Peer: %v Ξ].\nAccept (y/n)? ", alias, ourBal, theirBal)
-	Prompt(msg, func(userInput string) {
-		ctx, cancel := context.WithTimeout(context.Background(), config.Node.HandleTimeout)
-		defer cancel()
 
-		if userInput == "y" {
-			fmt.Printf("✅ Channel proposal accepted. Opening channel...\n")
-			a := req.Accept(n.offChain.Address(), client.WithRandomNonce())
-			if _, err := res.Accept(ctx, a); err != nil {
-				n.log.Error(errors.WithMessage(err, "accepting channel proposal"))
-				return
-			}
-		} else {
-			fmt.Printf("❌ Channel proposal rejected\n")
-			if err := res.Reject(ctx, "rejected by user"); err != nil {
-				n.log.Error(errors.WithMessage(err, "rejecting channel proposal"))
-				return
-			}
+	ctx, cancel := context.WithTimeout(context.Background(), config.Node.HandleTimeout)
+	defer cancel()
+	// Check that the channel has sufficient funding balances.
+	stakeFloat := new(big.Float).SetInt(n.stake) // Convert n.stake to *big.Float
+	fmt.Printf("🔁 Incoming channel proposal from %v with funding [My: %v Ξ, Peer: %v Ξ].\n", alias, ourBal, theirBal)
+	fmt.Printf("Stake: %v Ξ\n", stakeFloat)
+	if theirBal.Cmp(stakeFloat) > 0 && ourBal.Cmp(stakeFloat) > 0 {
+		fmt.Printf("✅ Channel proposal accepted. Opening channel...\n")
+		a := req.Accept(n.offChain.Address(), client.WithRandomNonce())
+		if _, err := res.Accept(ctx, a); err != nil {
+			n.log.Error(errors.WithMessage(err, "accepting channel proposal"))
+			return
 		}
-	})
+		return
+	}
+
+	fmt.Printf("❌ Channel proposal rejected\n")
+	if err := res.Reject(ctx, "Invalid funding balance"); err != nil {
+		n.log.Error(errors.WithMessage(err, "rejecting channel proposal"))
+		return
+	}
+
 }
 
 func (n *node) Open(args []string) error {
@@ -307,12 +324,16 @@ func (n *node) Open(args []string) error {
 		Balances: [][]*big.Int{etherToWei(myBalEth, peerBalEth)},
 	}
 
+	firstActorIdx := channel.Index(0)
+	withApp := client.WithApp(n.app, n.app.InitData(firstActorIdx))
+
 	prop, err := client.NewLedgerChannelProposal(
 		config.Channel.ChallengeDurationSec,
 		n.offChain.Address(),
 		initBals,
 		[]wire.Address{n.onChain.Address(), peer.perunID},
 		client.WithRandomNonce(),
+		withApp,
 	)
 	if err != nil {
 		return errors.WithMessage(err, "creating channel proposal")
@@ -333,7 +354,22 @@ func (n *node) Open(args []string) error {
 	return nil
 }
 
-func (n *node) Send(args []string) error {
+// func (n *node) Send(args []string) error {
+// 	n.mtx.Lock()
+// 	defer n.mtx.Unlock()
+// 	n.log.Traceln("Sending...")
+
+// 	peer := n.peers[args[0]]
+// 	if peer == nil {
+// 		return errors.Errorf("peer not found %s", args[0])
+// 	} else if peer.ch == nil {
+// 		return errors.Errorf("connect to peer first")
+// 	}
+// 	amountEth, _ := new(big.Float).SetString(args[1]) // Input was already validated by command parser.
+// 	return peer.ch.sendMoney(etherToWei(amountEth)[0])
+// }
+
+func (n *node) Set(args []string) error {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	n.log.Traceln("Sending...")
@@ -344,8 +380,76 @@ func (n *node) Send(args []string) error {
 	} else if peer.ch == nil {
 		return errors.Errorf("connect to peer first")
 	}
-	amountEth, _ := new(big.Float).SetString(args[1]) // Input was already validated by command parser.
-	return peer.ch.sendMoney(etherToWei(amountEth)[0])
+
+	model, err := strconv.Atoi(args[1])
+	if err != nil {
+		return errors.WithMessage(err, "converting model string to int")
+	}
+
+	numberOfRounds, err := strconv.Atoi(args[2])
+	if err != nil {
+		return errors.WithMessage(err, "converting numberOfRounds string to int")
+	}
+
+	weight, err := strconv.Atoi(args[3])
+	if err != nil {
+		return errors.WithMessage(err, "converting weight string to int")
+	}
+
+	accuracy, err := strconv.Atoi(args[4])
+	if err != nil {
+		return errors.WithMessage(err, "converting accuracy string to int")
+	}
+
+	loss, err := strconv.Atoi(args[5])
+	if err != nil {
+		return errors.WithMessage(err, "converting loss string to int")
+	}
+
+	err = peer.ch.Set(model, numberOfRounds, weight, accuracy, loss)
+	return err
+}
+
+
+func (n *node) ForceSet(args []string) error {
+	n.mtx.Lock()
+	defer n.mtx.Unlock()
+	n.log.Traceln("Sending...")
+
+	peer := n.peers[args[0]]
+	if peer == nil {
+		return errors.Errorf("peer not found %s", args[0])
+	} else if peer.ch == nil {
+		return errors.Errorf("connect to peer first")
+	}
+
+	model, err := strconv.Atoi(args[1])
+	if err != nil {
+		return errors.WithMessage(err, "converting model string to int")
+	}
+
+	numberOfRounds, err := strconv.Atoi(args[2])
+	if err != nil {
+		return errors.WithMessage(err, "converting numberOfRounds string to int")
+	}
+
+	weight, err := strconv.Atoi(args[3])
+	if err != nil {
+		return errors.WithMessage(err, "converting weight string to int")
+	}
+
+	accuracy, err := strconv.Atoi(args[4])
+	if err != nil {
+		return errors.WithMessage(err, "converting accuracy string to int")
+	}
+
+	loss, err := strconv.Atoi(args[5])
+	if err != nil {
+		return errors.WithMessage(err, "converting loss string to int")
+	}
+
+	err = peer.ch.ForceSet(model, numberOfRounds, weight, accuracy, loss)
+	return err
 }
 
 func (n *node) Close(args []string) error {
@@ -358,9 +462,9 @@ func (n *node) Close(args []string) error {
 	if peer == nil {
 		return errors.Errorf("Unknown peer: %s", alias)
 	}
-	if err := peer.ch.sendFinal(); err != nil {
-		return errors.WithMessage(err, "sending final state for state closing")
-	}
+	// if err := peer.ch.sendFinal(); err != nil {
+	// 	return errors.WithMessage(err, "sending final state for state closing")
+	// }
 
 	if err := n.settle(peer); err != nil {
 		return errors.WithMessage(err, "settling")
@@ -374,11 +478,11 @@ func (n *node) settle(p *peer) error {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.SettleTimeout)
 	defer cancel()
 
-	if err := p.ch.Settle(ctx, p.ch.Idx() == 0); err != nil {
+	if err := p.ch.ch.Settle(ctx, p.ch.ch.Idx() == 0); err != nil {
 		return errors.WithMessage(err, "settling the channel")
 	}
 
-	if err := p.ch.Close(); err != nil {
+	if err := p.ch.ch.Close(); err != nil {
 		return errors.WithMessage(err, "channel closing")
 	}
 	p.ch.log.Debug("Removing channel")
@@ -407,7 +511,7 @@ func (n *node) Info(args []string) error {
 		} else {
 			bals := weiToEther(peer.ch.GetBalances())
 			fmt.Fprintf(w, "%s\t%v\t%d\t%v\t%v\t%v\t%v\t\n",
-				alias, peer.ch.Phase(), peer.ch.State().Version, bals[0], bals[1], onChainBalsEth[0], onChainBalsEth[1])
+				alias, peer.ch.ch.Phase(), peer.ch.ch.State().Version, bals[0], bals[1], onChainBalsEth[0], onChainBalsEth[1])
 		}
 	}
 	fmt.Fprintln(w)

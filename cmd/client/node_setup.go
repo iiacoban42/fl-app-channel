@@ -33,6 +33,8 @@ import (
 	wirenet "perun.network/go-perun/wire/net"
 	"perun.network/go-perun/wire/net/simple"
 	"perun.network/perun-examples/app-channel/cmd/contracts/generated/FLApp"
+	"perun.network/perun-examples/app-channel/cmd/app"
+	"perun.network/go-perun/channel"
 )
 
 var (
@@ -111,10 +113,15 @@ func (n *node) setup() error {
 		return errors.WithMessage(err, "could not start tcp listener")
 	}
 
+	n.app = app.NewFLApp(ethwallet.AsWalletAddr(config.Chain.app))
+	n.stake = big.NewInt(50)
+
 	n.client.OnNewChannel(n.setupChannel)
 	if err := n.setupPersistence(); err != nil {
 		return errors.WithMessage(err, "setting up persistence")
 	}
+	channel.RegisterApp(n.app)
+
 	go n.client.Handle(n, n)
 	go n.bus.Listen(listener)
 	n.PrintConfig()
@@ -180,7 +187,12 @@ func (n *node) setupContracts() error {
 	n.log.WithField("Adj", n.adjAddr).WithField("Asset", n.assetAddr).Debug("Set contracts")
 
 	funder := ethchannel.NewFunder(n.cb)
-	funder.RegisterAsset(ethwallet.Address(n.assetAddr), new(ethchannel.ETHDepositor), n.onChain.Account)
+	dep := ethchannel.NewETHDepositor()
+	asset := ethwallet.Address(n.assetAddr)
+	funder.RegisterAsset(asset, dep, n.onChain.Account)
+
+	// funder := ethchannel.NewFunder(n.cb)
+	// funder.RegisterAsset(ethwallet.Address(n.assetAddr), new(ethchannel.ETHDepositor), n.onChain.Account)
 	n.funder = funder
 
 	n.appAddr = appAddr
