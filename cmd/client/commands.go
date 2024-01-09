@@ -59,10 +59,15 @@ func init() {
 		// 	"Send a payment with amount to a given peer over the established channel.\nExample: send alice 5",
 		// 	func(args []string) error { return backend.Send(args) },
 		// }, {
-			"close",
+		// 	"close",
+		// 	[]argument{{"Peer", valPeer}},
+		// 	"Close a the channel with the given peer. This will push the latest state to the block chain.\nExample: close alice",
+		// 	func(args []string) error { return backend.Close(args) },
+		// }, {
+			"settle",
 			[]argument{{"Peer", valPeer}},
-			"Close a the channel with the given peer. This will push the latest state to the block chain.\nExample: close alice",
-			func(args []string) error { return backend.Close(args) },
+			"Settle a the channel with the given peer. Note: both parties need to initiate a settle command. This will push the latest state to the block chain.\nExample: settle alice",
+			func(args []string) error { return backend.Settle(args) },
 		}, {
 			"config",
 			nil,
@@ -74,6 +79,17 @@ func init() {
 			"Print information about funds, peers, and channels.",
 			func(args []string) error { return backend.Info(args) },
 		}, {
+			"start",
+			nil,
+			"Start experiment run.",
+			func([]string) error { return backend.Start() },
+		}, {
+			"openchan",
+			nil,
+			"Open channels with all peers.",
+			func([]string) error { return backend.OpenChannels() },
+		}, {
+
 		// 	"benchmark",
 		// 	[]argument{{"Peer", valPeer}, {"amount", valUInt}, {"txCount", valUInt}},
 		// 	"Performs a benchmark with the given peer by sending amount ETH in txCount micro transactions. Must have an open channel with the peer.",

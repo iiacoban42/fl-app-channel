@@ -44,7 +44,7 @@ def generate_peer_and_network_files():
     # Create config files for each peer
     for i, account in enumerate(accounts):
         if i == 0:
-            config_template['chain']['contractsetup'] = 'deploy'
+            config_template['chain']['contractsetup'] = 'validateordeploy'
         else:
             config_template['chain']['contractsetup'] = 'validate'
 

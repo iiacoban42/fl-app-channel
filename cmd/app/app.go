@@ -231,17 +231,17 @@ func checkFLRoundTransitionConstraints(fromData, toData *FLAppData) error {
 func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State, idx channel.Index) error {
 	err := channel.AssetsAssertEqual(from.Assets, to.Assets)
 	if err != nil {
-		return fmt.Errorf("Invalid assets: %v", err)
+		return fmt.Errorf("invalid assets: %v", to.Assets)
 	}
 
 	fromData, ok := from.Data.(*FLAppData)
 	if !ok {
-		panic(fmt.Sprintf("from state: invalid data type: %T", from.Data))
+		return fmt.Errorf("from state: invalid data type: %T", from.Data)
 	}
 
 	toData, ok := to.Data.(*FLAppData)
 	if !ok {
-		panic(fmt.Sprintf("to state: invalid data type: %T", from.Data))
+		return fmt.Errorf("to state: invalid data type: %T", to.Data)
 	}
 
 	// Check actor.
@@ -251,8 +251,9 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 
 	// Check next actor.
 	if len(params.Parts) != numParts {
-		panic("invalid number of participants")
+		return fmt.Errorf("invalid number of participants expected %v, got %v", numParts, len(params.Parts))
 	}
+
 	expectedToNextActor := calcNextActor(fromData.NextActor)
 	if toData.NextActor != expectedToNextActor {
 		return fmt.Errorf("invalid next actor: expected %v, got %v", expectedToNextActor, toData.NextActor)
@@ -295,12 +296,22 @@ func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, l
 		return fmt.Errorf("invalid data type: %T", d)
 	}
 
-	d.Set(model, numberOfRounds, weight, accuracy, loss, actorIdx)
+	fmt.Println("🔁 Setting state")
+
+
+	err := d.Set(model, numberOfRounds, weight, accuracy, loss, actorIdx)
+	if err != nil {
+		return err
+	}
 	log.Println("\n" + d.String())
+	
+	fmt.Println(d.String())
 
 	if checkClientReward := d.checkClientReward(); checkClientReward {
-		fmt.Println("Client reward")
+		fmt.Println("Client rewarded")
 		s.Balances = payCLientForContrib(s.Balances)
+		fmt.Printf("💰 Sent payment. New balance: [My: %v Ξ, Peer: %v Ξ]\n", s.Balances[0][1],  s.Balances[0][0])
+
 	}
 
 	if isFinal, _ := d.CheckFinal(); isFinal {

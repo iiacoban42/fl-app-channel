@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/big"
-	
+
 	"perun.network/go-perun/channel"
 	"perun.network/go-perun/client"
 	"perun.network/perun-examples/app-channel/cmd/app"
@@ -25,7 +25,6 @@ func newFLChannel(ch *client.Channel) *FLChannel {
 		log:       log.WithField("channel", ch.ID()),
 	}
 }
-
 
 // func stateBals(state *channel.State) []channel.Bal {
 // 	return state.Balances[0]
@@ -67,32 +66,33 @@ func (g *FLChannel) ForceSet(model, numberOfRounds, weight, accuracy, loss int) 
 			return app.Set(state, model, numberOfRounds, weight, accuracy, loss, g.ch.Idx())
 		}()
 		if err != nil {
-			panic(err)
+			panic(fmt.Errorf("force update error: %v", err))
 		}
 	})
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("force update error: %v", err)
 	}
 
-	return err
+	return nil
 }
 
 // Settle settles the app channel and withdraws the funds.
-func (g *FLChannel) Settle() {
-	// Channel should be finalized through last ("winning") move.
-	// No need to set `isFinal` here.
-	g.log.Debugf("Settle channel: %s", g.ch.ID())
-	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.Timeout)
-	defer cancel()
+// func (g *FLChannel) Settle(secondary bool) error {
+// 	// Channel should be finalized through last ("winning") move.
+// 	// No need to set `isFinal` here.
+// 	g.log.Debugf("Settle channel: %s", g.ch.ID())
+// 	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.Timeout)
+// 	defer cancel()
 
-	err := g.ch.Settle(ctx, false)
-	if err != nil {
-		panic(err)
-	}
+// 	err := g.ch.Settle(ctx, secondary)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// Cleanup.
-	g.ch.Close()
-}
+// 	// Cleanup.
+// 	g.ch.Close()
+// 	return nil
+// }
 
 
 func (g *FLChannel) GetBalances() (our, other *big.Int) {

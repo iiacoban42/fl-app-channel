@@ -144,7 +144,7 @@ contract FLApp is App {
     }
 
     function checkFinal(bytes memory d) internal pure returns (bool isFinal) {
-        if (d[numberOfRoundsIndex] == d[roundIndex] && uint8(d[numberOfRoundsIndex]) == 3) {
+        if (d[numberOfRoundsIndex] == d[roundIndex] && uint8(d[roundPhaseIndex]) == 3) {
                 return true;
         }
         return false;
@@ -152,7 +152,7 @@ contract FLApp is App {
     }
 
     function checkClientReward(bytes memory d) internal pure returns (bool isRewarded) { // check if client is rewarded
-        if (uint8(d[roundPhaseIndex]) == uint8(2) && uint8(d[roundIndex]) != uint8(0)) {
+        if (uint8(d[roundPhaseIndex]) == uint8(2) && uint8(d[weightIndex]) != uint8(0)) {
             return true;
         }
         return false;

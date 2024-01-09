@@ -114,7 +114,7 @@ func (n *node) setup() error {
 	}
 
 	n.app = app.NewFLApp(ethwallet.AsWalletAddr(config.Chain.app))
-	n.stake = big.NewInt(50)
+	n.stake = big.NewInt(1)
 
 	n.client.OnNewChannel(n.setupChannel)
 	if err := n.setupPersistence(); err != nil {

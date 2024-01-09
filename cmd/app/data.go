@@ -90,24 +90,16 @@ func (d *FLAppData) Clone() channel.Data {
 	return &_d
 }
 
-func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index) {
-	if d.NextActor != uint8safe(uint16(actorIdx)) {
-		panic("invalid actor")
+func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index) error {
+	actor := uint8safe(uint16(actorIdx))
+	if d.NextActor != actor {
+		return fmt.Errorf("invalid actor: expected %v, got %v", actor, d.NextActor)
 	}
-	// v := makeFieldValueFromPlayerIdx(actorIdx)
-	// d.Grid[y*3+x] = v
-
-	if d.NextActor != uint8safe(uint16(actorIdx)) {
-		panic("invalid actor")
-	}
-	// v := makeFieldValueFromPlayerRoundPhaserIdx(actorIdx)
-	// d.Grid[y*3+x] = v
 
 	if d.RoundPhase == 0{ // init then waiting for updates
 		// require that the round is 0
 		if d.Round != 0 {
-			fmt.Printf("round: %v\n", d.Round)
-			panic("invalid round")
+			return fmt.Errorf("invalid round: round cannot be %v in phase %v", d.Round, d.RoundPhase)
 		}
 		d.Model = uint8safe(uint16(model)) // set the model
 		d.NumberOfRounds = uint8safe(uint16(numberOfRounds)) // set the number of rounds
@@ -126,7 +118,7 @@ func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actor
 		} else if d.Round < d.NumberOfRounds - 1 {
 		d.RoundPhase = 1
 		} else {
-			panic("invalid round")
+			return fmt.Errorf("invalid round: round out of bound: %v", d.Round)
 		}
 		d.Round = uint8safe(uint16(d.Round + 1))
 
@@ -134,11 +126,12 @@ func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actor
 		fmt.Printf("waiting for termination")
 		d.RoundPhase = 4
 	} else {
-		panic("game already over")
+		return fmt.Errorf("game already over")
 	}
 
 	d.NextActor = calcNextActor(d.NextActor)
 
+	return nil
 }
 
 func calcNextActor(actor uint8) uint8 {

@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"sync"
 	"text/tabwriter"
+	// "time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/pkg/errors"
@@ -70,6 +71,11 @@ type node struct {
 	// Protects peers
 	mtx   sync.Mutex
 	peers map[string]*peer
+}
+
+
+func (n *node) getNodeAlias() string {
+	return config.Alias
 }
 
 func getOnChainBal(ctx context.Context, addrs ...wallet.Address) ([]*big.Int, error) {
@@ -208,16 +214,19 @@ func findConfig(id wallet.Address) (string, *netConfigEntry) {
 }
 
 func (n *node) HandleUpdate(_ *channel.State, update client.ChannelUpdate, resp *client.UpdateResponder) {
+	// defer n.updateFSM(update.State, update)
+
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	log := n.log.WithField("channel", update.State.ID)
 	log.Debug("Channel update")
 
-	// ch := n.channel(update.State.ID)
-	// if ch == nil {
-	// 	log.Error("Channel for ID not found")
-	// 	return
-	// }
+	ch := n.channel(update.State.ID)
+	if ch == nil {
+		log.Error("Channel for ID not found")
+		return
+	}
+
 	// ch.ch.Handle(update, resp)
 
 	ctx, cancel := context.WithTimeout(context.Background(), config.Node.HandleTimeout)
@@ -225,8 +234,61 @@ func (n *node) HandleUpdate(_ *channel.State, update client.ChannelUpdate, resp 
 
 	err := resp.Accept(ctx)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+		return
 	}
+
+	// if update.State.IsFinal {
+	// 	log.Debug("Closing channel")
+	// 	ch := n.channel(update.State.ID)
+	// 	ch.ch.Close()
+	// 	return
+	// }
+
+}
+
+// // this function is used to automate experiments
+// func (n *node) updateFSM(state *channel.State, update client.ChannelUpdate) {
+// 	fmt.Printf("🔁 FSM update: %v\n", state.Data)
+// 	n.mtx.Lock()
+// 	defer n.mtx.Unlock()
+
+// 	alias := n.getNodeAlias()
+
+// 	ch := n.channel(update.State.ID)
+// 	peer := n.channelPeer(ch.ch)
+// 	peerName := peer.alias
+
+// 	d := state.Data.(*app.FLAppData)
+// 	if d.RoundPhase == 0 && alias == "peer_0"{ // init then waiting for updates
+// 		// set model and number of rounds
+// 		// share model
+// 		n.Set([]string{peerName, "1", "2", "0", "0", "0"}) // change params here
+
+// 	} else if d.RoundPhase == 1 { //update then waiting for aggregation
+// 		// train
+// 		// set weight
+// 		weight := n.train()
+// 		n.Set([]string{peerName, string(d.Model), string(d.NumberOfRounds), string(rune(weight)), string(d.Accuracy[d.Round]), string(d.Loss[d.Round])})
+// 	}else if d.RoundPhase == 2 && alias == "peer_0" { // aggregate then waiting for updates
+// 		// aggregate
+// 		// set accuracy and loss
+// 		accuracy, loss := n.aggregate()
+// 		n.Set([]string{peerName, string(d.Model), string(d.NumberOfRounds), string(d.Weight[d.Round]), string(rune(accuracy)), string(rune(loss))})
+
+// 	} else if d.RoundPhase == 3 { //waiting for termination
+// 		// terminate
+// 		return
+// 	}
+
+// }
+
+func (n *node) aggregate() (int, int) {
+	return 0, 0
+}
+
+func (n *node) train() int{
+	return 0
 }
 
 func (n *node) channel(id channel.ID) *FLChannel {
@@ -308,6 +370,11 @@ func (n *node) Open(args []string) error {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	peerName := args[0]
+
+	if peerName == n.getNodeAlias() {
+		return errors.New("Cannot open channel with self")
+	}
+
 	peer := n.peers[peerName]
 	if peer == nil {
 		// try to connect to peer
@@ -411,6 +478,59 @@ func (n *node) Set(args []string) error {
 }
 
 
+func (n * node) OpenChannels() error {
+	alias := n.getNodeAlias()
+
+	fmt.Println("🔁 Setting up channels ...")
+	fmt.Println(n.peers)
+
+
+	if alias != "peer_0" {
+		return errors.Errorf("Peer_0 should start first, got: %s", alias)
+	}
+
+	// open channel with all peers
+	for peerAlias, _ := range config.Peers {
+		if alias != peerAlias {
+			fmt.Printf("🆕 Opening channel with %s...\n", peerAlias)
+				// Start the long-running function in a goroutine
+			n.Open([]string{alias, "500", "500"})
+		}
+	}
+	fmt.Println(n.peers)
+	return nil
+}
+
+func (n * node) Start() error {
+	// get node alias
+	// n.mtx.Lock()
+	// defer n.mtx.Unlock()
+
+	alias := n.getNodeAlias()
+
+	fmt.Println("🔁 Starting training...")
+	fmt.Println(n.peers)
+
+
+	if alias != "peer_0" {
+		return errors.Errorf("Peer_0 should start first, got: %s", alias)
+	}
+
+	// share model and number of rounds with all peers
+	for peerAlias, _ := range config.Peers {
+		if alias != peerAlias {
+			fmt.Printf("💪 Start training with %s...\n", peerAlias)
+			n.Set([]string{peerAlias, "1", "2", "0", "0", "0"})
+		}
+	}
+	// n.longRunningFunction()
+
+	fmt.Println("🔁 training done...")
+
+	return nil
+}
+
+
 func (n *node) ForceSet(args []string) error {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
@@ -452,7 +572,7 @@ func (n *node) ForceSet(args []string) error {
 	return err
 }
 
-func (n *node) Close(args []string) error {
+func (n *node) Settle(args []string) error {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	n.log.Traceln("Closing...")
@@ -462,16 +582,60 @@ func (n *node) Close(args []string) error {
 	if peer == nil {
 		return errors.Errorf("Unknown peer: %s", alias)
 	}
-	// if err := peer.ch.sendFinal(); err != nil {
-	// 	return errors.WithMessage(err, "sending final state for state closing")
+
+	// check the value of isFinal in app data
+	if !peer.ch.ch.State().IsFinal {
+		return errors.Errorf("Cannot close channel: channel state is not final with peer: %s", alias)
+	}
+
+	peer.ch.log.Debug("Settling")
+	// secondary := (peer.ch.ch.Idx() == 0)
+	// if err := peer.ch.Settle(secondary); err != nil {
+	// 	return errors.WithMessage(err, "settling the channel")
 	// }
 
-	if err := n.settle(peer); err != nil {
-		return errors.WithMessage(err, "settling")
+	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.Timeout)
+	defer cancel()
+
+	err := peer.ch.ch.Settle(ctx, false)
+	if err != nil {
+		return err
 	}
+
+	// Cleanup.
+	peer.ch.ch.Close()
+
+	// if err := peer.ch.ch.Close(); err != nil {
+	// 	return errors.WithMessage(err, "channel closing")
+	// }
+
+	peer.ch.log.Debug("Removing channel")
+	peer.ch = nil
+
 	fmt.Printf("\r🏁 Settled channel with %s.\n", peer.alias)
 	return nil
 }
+
+// func (n *node) Close(args []string) error {
+// 	n.mtx.Lock()
+// 	defer n.mtx.Unlock()
+// 	n.log.Traceln("Closing...")
+
+// 	alias := args[0]
+// 	peer := n.peers[alias]
+// 	if peer == nil {
+// 		return errors.Errorf("Unknown peer: %s", alias)
+// 	}
+// 	if err := peer.ch.sendFinal(); err != nil {
+// 		return errors.WithMessage(err, "sending final state for state closing")
+// 	}
+
+// 	if err := n.settle(peer); err != nil {
+// 		return errors.WithMessage(err, "settling")
+// 	}
+// 	fmt.Printf("\r🏁 Settled channel with %s.\n", peer.alias)
+// 	return nil
+// }
 
 func (n *node) settle(p *peer) error {
 	p.ch.log.Debug("Settling")
