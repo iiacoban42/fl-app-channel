@@ -42,17 +42,23 @@ func init() {
 			"open",
 			[]argument{{"Peer", valAlias}, {"Our Balance", valBal}, {"Their Balance", valBal}},
 			"Open a payment channel with the given peer and balances. The first value is the own balance and the second value is the peers balance. It is only possible to open one channel per peer.\nExample: open alice 10 10",
-			func(args []string) error { return backend.Open(args) },
+			func(args []string) error {
+				_, err := backend.Open(args)
+				return err},
 		}, {
 			"set",
 			[]argument{{"Peer", valAlias}, {"Model", valString}, {"Number of Rounds", valString}, {"Weight", valString}, {"Accuracy", valString}, {"Loss", valString}},
 			"Set channel state set client 2 3 0 0 0",
-			func(args []string) error { return backend.Set(args) },
+			func(args []string) error {
+				_, err := backend.Set(args)
+				return err},
 		}, {
 			"forceset",
 			[]argument{{"Peer", valAlias}, {"Model", valString}, {"Number of Rounds", valString}, {"Weight", valString}, {"Accuracy", valString}, {"Loss", valString}},
 			"ForceSet channel state set client 2 3 0 0 0",
-			func(args []string) error { return backend.ForceSet(args) },
+			func(args []string) error {
+				_, err := backend.ForceSet(args)
+				return err},
 		}, {
 		// 	"send",
 		// 	[]argument{{"Peer", valPeer}, {"Amount", valBal}},
@@ -67,17 +73,23 @@ func init() {
 			"settle",
 			[]argument{{"Peer", valPeer}},
 			"Settle a the channel with the given peer. Note: both parties need to initiate a settle command. This will push the latest state to the block chain.\nExample: settle alice",
-			func(args []string) error { return backend.Settle(args) },
+			func(args []string) error {
+				_, err := backend.Settle(args)
+				return err },
 		}, {
 			"config",
 			nil,
 			"Print the current configuration and known peers.",
-			func([]string) error { return backend.PrintConfig() },
+			func([]string) error {
+				_, err := backend.PrintConfig()
+				return err },
 		}, {
 			"info",
 			nil,
 			"Print information about funds, peers, and channels.",
-			func(args []string) error { return backend.Info(args) },
+			func(args []string) error {
+				_, err := backend.Info(args)
+				return err },
 		}, {
 			"start",
 			nil,

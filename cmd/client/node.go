@@ -366,20 +366,22 @@ func (n *node) HandleProposal(prop client.ChannelProposal, res *client.ProposalR
 
 }
 
-func (n *node) Open(args []string) error {
+func (n *node) Open(args []string) (string, error) {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	peerName := args[0]
 
+	fmt.Println(args)
+
 	if peerName == n.getNodeAlias() {
-		return errors.New("Cannot open channel with self")
+		return "Cannot open channel with self", errors.New("Cannot open channel with self")
 	}
 
 	peer := n.peers[peerName]
 	if peer == nil {
 		// try to connect to peer
 		if err := n.connect(peerName); err != nil {
-			return err
+			return "error connecting to peer" + peerName, err
 		}
 		peer = n.peers[peerName]
 	}
@@ -403,7 +405,7 @@ func (n *node) Open(args []string) error {
 		withApp,
 	)
 	if err != nil {
-		return errors.WithMessage(err, "creating channel proposal")
+		return "error creating channel proposal", errors.WithMessage(err, "creating channel proposal")
 	}
 
 	fmt.Printf("💭 Proposing channel to %v...\n", peerName)
@@ -413,12 +415,12 @@ func (n *node) Open(args []string) error {
 	n.log.Debug("Proposing channel")
 	ch, err := n.client.ProposeChannel(ctx, prop)
 	if err != nil {
-		return errors.WithMessage(err, "proposing channel failed")
+		return "proposing channel failed", errors.WithMessage(err, "proposing channel failed")
 	}
 	if n.channel(ch.ID()) == nil {
-		return errors.New("OnNewChannel handler could not setup channel")
+		return "OnNewChannel handler could not setup channel", errors.New("OnNewChannel handler could not setup channel")
 	}
-	return nil
+	return "channel opened with " + peerName, nil
 }
 
 // func (n *node) Send(args []string) error {
@@ -436,47 +438,49 @@ func (n *node) Open(args []string) error {
 // 	return peer.ch.sendMoney(etherToWei(amountEth)[0])
 // }
 
-func (n *node) Set(args []string) error {
+func (n *node) Set(args []string) (string, error) {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	n.log.Traceln("Sending...")
 
 	peer := n.peers[args[0]]
 	if peer == nil {
-		return errors.Errorf("peer not found %s", args[0])
+		return "peer not found " + args[0], errors.Errorf("peer not found %s", args[0])
 	} else if peer.ch == nil {
-		return errors.Errorf("connect to peer first")
+		return "error connect to peer first", errors.Errorf("connect to peer first")
 	}
 
 	model, err := strconv.Atoi(args[1])
 	if err != nil {
-		return errors.WithMessage(err, "converting model string to int")
+		return "error converting model string to int", errors.WithMessage(err, "converting model string to int")
 	}
 
 	numberOfRounds, err := strconv.Atoi(args[2])
 	if err != nil {
-		return errors.WithMessage(err, "converting numberOfRounds string to int")
+		return "error converting numberOfRounds string to int", errors.WithMessage(err, "converting numberOfRounds string to int")
 	}
 
 	weight, err := strconv.Atoi(args[3])
 	if err != nil {
-		return errors.WithMessage(err, "converting weight string to int")
+		return "error converting weight string to int", errors.WithMessage(err, "converting weight string to int")
 	}
 
 	accuracy, err := strconv.Atoi(args[4])
 	if err != nil {
-		return errors.WithMessage(err, "converting accuracy string to int")
+		return "error converting accuracy string to int", errors.WithMessage(err, "converting accuracy string to int")
 	}
 
 	loss, err := strconv.Atoi(args[5])
 	if err != nil {
-		return errors.WithMessage(err, "converting loss string to int")
+		return  "converting loss string to int", errors.WithMessage(err, "converting loss string to int")
 	}
 
 	err = peer.ch.Set(model, numberOfRounds, weight, accuracy, loss)
-	return err
+	if err != nil {
+		return "error setting channel state", err
+	}
+	return "channel state set", nil
 }
-
 
 func (n * node) OpenChannels() error {
 	alias := n.getNodeAlias()
@@ -531,48 +535,51 @@ func (n * node) Start() error {
 }
 
 
-func (n *node) ForceSet(args []string) error {
+func (n *node) ForceSet(args []string) (string, error) {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	n.log.Traceln("Sending...")
 
 	peer := n.peers[args[0]]
 	if peer == nil {
-		return errors.Errorf("peer not found %s", args[0])
+		return "peer not found " + args[0], errors.Errorf("peer not found %s", args[0])
 	} else if peer.ch == nil {
-		return errors.Errorf("connect to peer first")
+		return "connect to peer first", errors.Errorf("connect to peer first")
 	}
 
 	model, err := strconv.Atoi(args[1])
 	if err != nil {
-		return errors.WithMessage(err, "converting model string to int")
+		return "converting model string to int", errors.WithMessage(err, "converting model string to int")
 	}
 
 	numberOfRounds, err := strconv.Atoi(args[2])
 	if err != nil {
-		return errors.WithMessage(err, "converting numberOfRounds string to int")
+		return "converting numberOfRounds string to int", errors.WithMessage(err, "converting numberOfRounds string to int")
 	}
 
 	weight, err := strconv.Atoi(args[3])
 	if err != nil {
-		return errors.WithMessage(err, "converting weight string to int")
+		return "converting weight string to int", errors.WithMessage(err, "converting weight string to int")
 	}
 
 	accuracy, err := strconv.Atoi(args[4])
 	if err != nil {
-		return errors.WithMessage(err, "converting accuracy string to int")
+		return "converting accuracy string to int", errors.WithMessage(err, "converting accuracy string to int")
 	}
 
 	loss, err := strconv.Atoi(args[5])
 	if err != nil {
-		return errors.WithMessage(err, "converting loss string to int")
+		return  "converting loss string to int", errors.WithMessage(err, "converting loss string to int")
 	}
 
 	err = peer.ch.ForceSet(model, numberOfRounds, weight, accuracy, loss)
-	return err
+	if err != nil {
+		return "error force setting channel state", err
+	}
+	return "channel state force set", nil
 }
 
-func (n *node) Settle(args []string) error {
+func (n *node) Settle(args []string) (string, error) {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	n.log.Traceln("Closing...")
@@ -580,12 +587,12 @@ func (n *node) Settle(args []string) error {
 	alias := args[0]
 	peer := n.peers[alias]
 	if peer == nil {
-		return errors.Errorf("Unknown peer: %s", alias)
+		return "Unknown peer:" + alias ,errors.Errorf("Unknown peer: %s", alias)
 	}
 
 	// check the value of isFinal in app data
 	if !peer.ch.ch.State().IsFinal {
-		return errors.Errorf("Cannot close channel: channel state is not final with peer: %s", alias)
+		return "Cannot close channel: channel state is not final with peer: " + alias,  errors.Errorf("Cannot close channel: channel state is not final with peer: %s", alias)
 	}
 
 	peer.ch.log.Debug("Settling")
@@ -599,7 +606,7 @@ func (n *node) Settle(args []string) error {
 
 	err := peer.ch.ch.Settle(ctx, false)
 	if err != nil {
-		return err
+		return "Error settling channel with " + alias, err
 	}
 
 	// Cleanup.
@@ -613,7 +620,7 @@ func (n *node) Settle(args []string) error {
 	peer.ch = nil
 
 	fmt.Printf("\r🏁 Settled channel with %s.\n", peer.alias)
-	return nil
+	return "Settled channel with " + peer.alias, nil
 }
 
 // func (n *node) Close(args []string) error {
@@ -655,7 +662,7 @@ func (n *node) settle(p *peer) error {
 }
 
 // Info prints the phase of all channels.
-func (n *node) Info(args []string) error {
+func (n *node) Info(args []string) (string, error) {
 	n.mtx.Lock()
 	defer n.mtx.Unlock()
 	n.log.Traceln("Info...")
@@ -664,24 +671,28 @@ func (n *node) Info(args []string) error {
 	defer cancel()
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', tabwriter.Debug)
 	fmt.Fprintf(w, "Peer\tPhase\tVersion\tMy Ξ\tPeer Ξ\tMy On-Chain Ξ\tPeer On-Chain Ξ\t\n")
+	res := "Peer\tPhase\tVersion\tMy Ξ\tPeer Ξ\tMy On-Chain Ξ\tPeer On-Chain Ξ\t\n"
 	for alias, peer := range n.peers {
 		onChainBals, err := getOnChainBal(ctx, n.onChain.Address(), peer.perunID)
 		if err != nil {
-			return err
+			return "error getting on-chain ballances", err
 		}
 		onChainBalsEth := weiToEther(onChainBals...)
 		if peer.ch == nil {
 			fmt.Fprintf(w, "%s\t%s\t \t \t \t%v\t%v\t\n", alias, "Connected", onChainBalsEth[0], onChainBalsEth[1])
+			res += fmt.Sprintf("%s\t%s\t \t \t \t%v\t%v\t\n", alias, "Connected", onChainBalsEth[0], onChainBalsEth[1])
 		} else {
 			bals := weiToEther(peer.ch.GetBalances())
 			fmt.Fprintf(w, "%s\t%v\t%d\t%v\t%v\t%v\t%v\t\n",
+				alias, peer.ch.ch.Phase(), peer.ch.ch.State().Version, bals[0], bals[1], onChainBalsEth[0], onChainBalsEth[1])
+			res += fmt.Sprintf("%s\t%v\t%d\t%v\t%v\t%v\t%v\t\n",
 				alias, peer.ch.ch.Phase(), peer.ch.ch.State().Version, bals[0], bals[1], onChainBalsEth[0], onChainBalsEth[1])
 		}
 	}
 	fmt.Fprintln(w)
 	w.Flush()
 
-	return nil
+	return res, nil
 }
 
 func (n *node) Exit([]string) error {

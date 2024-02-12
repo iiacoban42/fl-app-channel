@@ -41,6 +41,7 @@ type channelConfig struct {
 type nodeConfig struct {
 	IP              string
 	Port            uint16
+	APIPort		    uint16
 	DialTimeout     time.Duration
 	HandleTimeout   time.Duration
 	ReconnecTimeout time.Duration
@@ -95,6 +96,7 @@ type netConfigEntry struct {
 	perunID  wire.Address
 	Hostname string
 	Port     uint16
+	APIPort  uint16
 }
 
 var config Config

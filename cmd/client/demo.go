@@ -38,7 +38,7 @@ var flags CommandLineFlags
 func init() {
 	demoCmd.PersistentFlags().StringVar(&flags.cfgFile, "config", "config/config.yaml", "General config file")
 	demoCmd.PersistentFlags().StringVar(&flags.cfgNetFile, "network", "config/network.yaml", "Network config file")
-	demoCmd.PersistentFlags().BoolVar(&flags.testAPIEnabled, "test-api", false, "Expose testing API at 8080")
+	demoCmd.PersistentFlags().BoolVar(&flags.testAPIEnabled, "test-api", true, "Expose testing API at 8080")
 	demoCmd.PersistentFlags().BoolVar(&GetConfig().Node.PersistenceEnabled, "persistence", false, "Enables the persistence")
 	demoCmd.PersistentFlags().StringVar(&GetConfig().SecretKey, "sk", "", "ETH Secret Key")
 	viper.BindPFlag("secretkey", demoCmd.PersistentFlags().Lookup("sk"))

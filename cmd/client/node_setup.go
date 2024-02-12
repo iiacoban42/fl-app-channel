@@ -334,8 +334,8 @@ func newTransactionContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), config.Chain.TxTimeout)
 }
 
-func (n *node) PrintConfig() error {
-	fmt.Printf(
+func (n *node) PrintConfig() (string, error) {
+	res := fmt.Sprintf(
 		"Alias: %s\n"+
 			"Listening: %s:%d\n"+
 			"ETH RPC URL: %s\n"+
@@ -345,11 +345,13 @@ func (n *node) PrintConfig() error {
 			"Adjudicator: %s\n"+
 			"App: %s\n"+
 			"", config.Alias, config.Node.IP, config.Node.Port, config.Chain.URL, n.onChain.Address().String(), n.offChain.Address().String(), n.assetAddr.String(), n.adjAddr.String(), n.appAddr.String())
-
+	fmt.Println(res)
+	res += "\n Known peers:\n"
 	fmt.Println("Known peers:")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', tabwriter.TabIndent)
 	for alias, peer := range config.Peers {
+		res += fmt.Sprintf("%s\t%v\t%s:%d\n", alias, peer.PerunID, peer.Hostname, peer.Port)
 		fmt.Fprintf(w, "%s\t%v\t%s:%d\n", alias, peer.PerunID, peer.Hostname, peer.Port)
 	}
-	return w.Flush()
+	return res, w.Flush()
 }

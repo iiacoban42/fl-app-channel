@@ -7,8 +7,11 @@ package client
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
+	"strings"
 
+	// "github.com/spf13/viper"
 	"github.com/spf13/viper"
 	"perun.network/go-perun/log"
 )
@@ -23,7 +26,7 @@ var api *testAPI
 // StartTestAPI sets the package variable `api` to a new `testAPI`
 // listening at 0.0.0.0:8080. Should be called after setting up the node.
 func StartTestAPI() {
-	api = newTestAPI("0.0.0.0:8080")
+	api = newTestAPI("0.0.0.0:"+ viper.GetString("node.apiport"))
 }
 
 func newTestAPI(url string) *testAPI {
@@ -80,21 +83,116 @@ func (a *testAPI) handleConnection(conn net.Conn) {
 }
 
 func (a *testAPI) execRequest(req string, conn net.Conn) string {
-	if req == "getbals" {
+
+	// Use strings.Split to parse the string
+	// The second argument is the delimiter (comma in this case)
+	args := strings.Split(req, ",")
+	fmt.Println(args)
+	if args[0] == "getbals" {
 		data, err := json.Marshal(backend.GetBals())
 		if err != nil {
 			log.Error(err)
 			return err.Error()
 		}
 		return string(data)
-	} else if req == "config" {
-		data, err := json.Marshal(viper.AllSettings())
+
+	} else if args[0] == "config" {
+		config, err := backend.PrintConfig()
 		if err != nil {
 			log.Error(err)
 			return err.Error()
 		}
+		data, err := json.Marshal(config)
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		log.Debug("data: ", string(data))
 		return string(data)
-	} else if err := Execute(req); err != nil {
+
+	} else if args[0] == "info" {
+		info, err := backend.Info(args[1:])
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		data, err := json.Marshal(info)
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		log.Debug("data: ", string(data))
+		return string(data)
+
+	} else if args[0] == "open" {
+
+		info, err := backend.Open(args[1:])
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		data, err := json.Marshal(info)
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		log.Debug("data: ", string(data))
+		return string(data)
+
+	} else if args[0] == "settle" {
+		info, err := backend.Settle(args[1:])
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		data, err := json.Marshal(info)
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		log.Debug("data: ", string(data))
+		return string(data)
+
+	} else if args[0] == "set" {
+		info, err := backend.Set(args[1:])
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		data, err := json.Marshal(info)
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		log.Debug("data: ", string(data))
+		return string(data)
+
+	} else if args[0] == "forceset" {
+		info, err := backend.ForceSet(args[1:])
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		data, err := json.Marshal(info)
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		log.Debug("data: ", string(data))
+		return string(data)
+
+	} else if args[0] == "exit" {
+		err := backend.Exit(args[1:])
+		if err != nil {
+			log.Error(err)
+			return err.Error()
+		}
+		log.Debug("Exiting cli...")
+		return "Exiting cli..."
+
+	} else if args[0] == "help" {
+		return "Commands: config, info, open, settle, exit"
+	}else if err := Execute(req); err != nil {
 		return err.Error()
 	}
 	return "OK"
