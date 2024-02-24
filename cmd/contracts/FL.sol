@@ -80,9 +80,7 @@ contract FLApp is App {
             if (uint8(from.appData[roundPhaseIndex]) != 0){ // unless we are in init phase
                 require(uint8(to.appData[roundIndex]) == uint8(from.appData[roundIndex]) + uint8(1), "actor must increment round");
 
-                require(uint8(to.appData[accuracyIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip accuracy");
-
-                require(uint8(to.appData[lossIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip loss");
+                require(uint8(to.appData[accuracyIndex+uint8(from.appData[roundIndex])]) != 0 || uint8(to.appData[lossIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip accuracy and loss");
             }
 
         }

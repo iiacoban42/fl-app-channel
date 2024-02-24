@@ -9,3 +9,8 @@ peers:
     hostname: 127.0.0.1
     port: 5751
     APIPort: 8082
+  peer_2:
+    perunID: 0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+    hostname: 127.0.0.1
+    port: 5752
+    APIPort: 8083

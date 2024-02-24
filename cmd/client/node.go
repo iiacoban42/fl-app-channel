@@ -488,17 +488,12 @@ func (n * node) OpenChannels() error {
 	fmt.Println("🔁 Setting up channels ...")
 	fmt.Println(n.peers)
 
-
-	if alias != "peer_0" {
-		return errors.Errorf("Peer_0 should start first, got: %s", alias)
-	}
-
 	// open channel with all peers
 	for peerAlias, _ := range config.Peers {
 		if alias != peerAlias {
 			fmt.Printf("🆕 Opening channel with %s...\n", peerAlias)
 				// Start the long-running function in a goroutine
-			n.Open([]string{alias, "500", "500"})
+			n.Open([]string{alias, "10", "10"})
 		}
 	}
 	fmt.Println(n.peers)

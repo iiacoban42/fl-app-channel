@@ -174,17 +174,14 @@ func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
 			return fmt.Errorf("actor: %v cannot override accuracy outside current round: expected %v, got %v", fromData.NextActor, fromData.Accuracy, toData.Accuracy)
 		}
 
-		if fromData.RoundPhase != 0 && toData.Accuracy[fromData.Round] == 0 { //accuracy is not set
-			return fmt.Errorf("actor: %v cannot skip accuracy", fromData.NextActor)
+		if fromData.RoundPhase != 0 && toData.Accuracy[fromData.Round] == 0 && toData.Loss[fromData.Round] == 0 { //accuracy and loss are not set
+			return fmt.Errorf("actor: %v cannot skip accuracy and loss", fromData.NextActor)
 		}
 
 		if !equalExcept(fromData.Loss[:], toData.Loss[:], int(fromData.Round)) {
 			return fmt.Errorf("actor: %v cannot override loss outside current round: expected %v, got %v", fromData.NextActor, fromData.Loss, toData.Loss)
 		}
 
-		if fromData.RoundPhase != 0 && toData.Loss[fromData.Round] == 0{ //loss is not set
-			return fmt.Errorf("actor: %v cannot skip loss", fromData.NextActor)
-		}
 	}
 	return nil
 }
@@ -304,7 +301,7 @@ func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, l
 		return err
 	}
 	log.Println("\n" + d.String())
-	
+
 	fmt.Println(d.String())
 
 	if checkClientReward := d.checkClientReward(); checkClientReward {
