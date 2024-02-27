@@ -21,7 +21,8 @@
         "tty": true,
         "command": "./app-channel demo --config config/peer_0.yaml",
         "ports": [
-          "5750:5750"
+          "5750:5750",
+          "8081:8081"
         ],
         "restart": "unless-stopped",
         "depends_on": [

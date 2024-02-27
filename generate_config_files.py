@@ -8,6 +8,8 @@ import copy
 import ipaddress
 from web3 import Web3
 
+DOCKERIZED = False
+
 def remove_quotes(file_path):
     """Remove the "'" characters from the config files"""
     # Read the contents of the file
@@ -51,19 +53,27 @@ def generate_peer_and_network_files():
         config_template['alias'] = f"peer_{i}"
         config_template['accountIndex'] = i
         config_template['node']['port'] = 5750 + i
+        config_template['node']['apiPort'] = 8081 + i
         config_template['node']['persistencePath'] = f"/tmp/peer_{i}"
         config_template['log']['file'] = f"logs/peer_{i}.log"
+        if not DOCKERIZED:
+            config_template['chain']['url'] = "ws://127.0.0.1:8545"
 
         with open(f"config/peer_{i}.yaml", "w", encoding="utf-8") as f:
             yaml.safe_dump(config_template, f, default_style=None, default_flow_style=False, sort_keys=False)
 
         # print(account)
         remove_quotes(f"config/peer_{i}.yaml")
+        if DOCKERIZED:
+            host = f"peer_{i}"
+        else:
+            host = "127.0.0.1"
         peer = {
             f"peer_{i}": {
                 "perunID": account,
-                "hostname": f"peer_{i}",
-                "port": 5750 + i
+                "hostname": host,
+                "port": 5750 + i,
+                "apiport": 8081 + i,
             }
         }
         network["peers"].update(peer)
@@ -105,9 +115,9 @@ def generate_docker_compose_file(network, subnet, min_ip, max_ip):
         # Configure the peer node
         peer_config["container_name"] = config["hostname"]
         peer_config["hostname"] = config["hostname"]
-        peer_config["ports"] = [f"{config['port']}:{config['port']}"]
+        peer_config["ports"] = [f"{config['port']}:{config['port']}", f"{config['apiport']}:{config['apiport']}"]
         peer_config["depends_on"] = ["ganache"]
-        peer_config["command"] = f'sh -c "./wait-for-it.sh ganache:8545 &&./app-channel demo --config config/{peer}.yaml"'
+        peer_config["command"] = f'sh -c "./wait-for-it.sh ganache:8545 &&./app-channel demo --config config/{peer}.yaml --log-level trace --log-file logs/{peer}.log"'
         # Add dependency on peer_0 if it is not peer_0
         # if peer != "peer_0":
         #     peer_config["depends_on"].append("peer_0")

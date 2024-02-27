@@ -339,12 +339,13 @@ func (n *node) PrintConfig() (string, error) {
 		"Alias: %s\n"+
 			"Listening: %s:%d\n"+
 			"ETH RPC URL: %s\n"+
+			"API port: %d\n"+
 			"Perun ID: %s\n"+
 			"OffChain: %s\n"+
 			"ETHAssetHolder: %s\n"+
 			"Adjudicator: %s\n"+
 			"App: %s\n"+
-			"", config.Alias, config.Node.IP, config.Node.Port, config.Chain.URL, n.onChain.Address().String(), n.offChain.Address().String(), n.assetAddr.String(), n.adjAddr.String(), n.appAddr.String())
+			"", config.Alias, config.Node.IP, config.Node.Port, config.Chain.URL, config.Node.APIPort, n.onChain.Address().String(), n.offChain.Address().String(), n.assetAddr.String(), n.adjAddr.String(), n.appAddr.String())
 	fmt.Println(res)
 	res += "\n Known peers:\n"
 	fmt.Println("Known peers:")
