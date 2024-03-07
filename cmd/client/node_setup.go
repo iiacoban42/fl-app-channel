@@ -16,8 +16,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	hdwallet "github.com/miguelmota/go-ethereum-hdwallet"
 	"github.com/pkg/errors"
@@ -25,6 +27,8 @@ import (
 	ethchannel "perun.network/go-perun/backend/ethereum/channel"
 	ethwallet "perun.network/go-perun/backend/ethereum/wallet"
 	phd "perun.network/go-perun/backend/ethereum/wallet/hd"
+	pkeystore "perun.network/go-perun/backend/ethereum/wallet/keystore"
+	"perun.network/go-perun/channel"
 	"perun.network/go-perun/channel/persistence/keyvalue"
 	"perun.network/go-perun/client"
 	"perun.network/go-perun/log"
@@ -32,9 +36,8 @@ import (
 	"perun.network/go-perun/watcher/local"
 	wirenet "perun.network/go-perun/wire/net"
 	"perun.network/go-perun/wire/net/simple"
-	"perun.network/perun-examples/app-channel/cmd/contracts/generated/FLApp"
 	"perun.network/perun-examples/app-channel/cmd/app"
-	"perun.network/go-perun/channel"
+	"perun.network/perun-examples/app-channel/cmd/contracts/generated/FLApp"
 )
 
 var (
@@ -57,9 +60,11 @@ func Setup() {
 }
 
 func newNode() (*node, error) {
-	wallet, acc, err := setupWallet(config.Mnemonic, config.AccountIndex)
+	// wallet, acc, err := setupWallet(config.Mnemonic, config.AccountIndex)
+
+	wallet, acc, err := importAccount(config.SecretKey)
 	if err != nil {
-		return nil, errors.WithMessage(err, "importing mnemonic")
+		return nil, errors.WithMessage(err, "importing secret key")
 	}
 	dialer := simple.NewTCPDialer(config.Node.DialTimeout)
 	signer := types.NewEIP155Signer(big.NewInt(config.Chain.ID))
@@ -69,7 +74,7 @@ func newNode() (*node, error) {
 		onChain: acc,
 		wallet:  wallet,
 		dialer:  dialer,
-		cb:      ethchannel.NewContractBackend(ethereumBackend, phd.NewTransactor(wallet.Wallet(), signer), config.Chain.TxFinalityDepth),
+		cb:      ethchannel.NewContractBackend(ethereumBackend, pkeystore.NewTransactor(*wallet, signer), config.Chain.TxFinalityDepth),
 		peers:   make(map[string]*peer),
 	}
 	return n, n.setup()
@@ -89,11 +94,7 @@ func (n *node) setup() error {
 
 	var err error
 
-	n.offChain, err = n.wallet.NewAccount()
-	if err != nil {
-		return errors.WithMessage(err, "creating account")
-	}
-
+	n.offChain = n.wallet.NewAccount()
 	n.log.WithField("off-chain", n.offChain.Address()).Info("Generating account")
 
 	n.bus = wirenet.NewBus(n.onChain, n.dialer)
@@ -249,8 +250,8 @@ func validateContract(cb ethchannel.ContractBackend) (common.Address, error) {
 	appAddr := config.Chain.app
 
 	emptyAddr := common.Address{}
-	if appAddr.String() == emptyAddr.String(){
-			return appAddr, errors.New("address is empty")
+	if appAddr.String() == emptyAddr.String() {
+		return appAddr, errors.New("address is empty")
 	}
 	// fmt.Println(appAddr.String())
 	bin := FLApp.FLAppMetaData.Bin
@@ -288,9 +289,8 @@ func deployAssetHolder(cb ethchannel.ContractBackend, adjudicator common.Address
 	return asset, errors.WithMessage(err, "deploying eth assetholder")
 }
 
-
 // deployFLApp deploys the FLApp to the blockchain and returns its address
-func deployFLApp(cb ethchannel.ContractBackend, acc accounts.Account) (common.Address, error){
+func deployFLApp(cb ethchannel.ContractBackend, acc accounts.Account) (common.Address, error) {
 	fmt.Println("🌐 Deploying FLApp")
 	const gasLimit = 30000000 // Must be sufficient for deploying FL.sol.
 	ctx, cancel := context.WithTimeout(context.Background(), config.Chain.TxTimeout)
@@ -328,6 +328,32 @@ func setupWallet(mnemonic string, accountIndex uint) (*phd.Wallet, *phd.Account,
 	}
 
 	return perunWallet, acc, nil
+}
+
+// importAccount is a helper method to import secret keys until we have the ethereum wallet done.
+func importAccount(secret string) (*pkeystore.Wallet, *pkeystore.Account, error) {
+	ks := keystore.NewKeyStore(config.WalletPath, 2, 1)
+	sk, err := crypto.HexToECDSA(secret[2:])
+	if err != nil {
+		return nil, nil, errors.WithMessage(err, "decoding secret key")
+	}
+	var ethAcc accounts.Account
+	addr := crypto.PubkeyToAddress(sk.PublicKey)
+	if ethAcc, err = ks.Find(accounts.Account{Address: addr}); err != nil {
+		ethAcc, err = ks.ImportECDSA(sk, "")
+		if err != nil && errors.Cause(err).Error() != "account already exists" {
+			return nil, nil, errors.WithMessage(err, "importing secret key")
+		}
+	}
+
+	wallet, err := pkeystore.NewWallet(ks, "")
+	if err != nil {
+		return nil, nil, errors.WithMessage(err, "creating wallet")
+	}
+
+	wAcc := pkeystore.NewAccountFromEth(wallet, &ethAcc)
+	acc, err := wallet.Unlock(wAcc.Address())
+	return wallet, acc.(*pkeystore.Account), err
 }
 
 func newTransactionContext() (context.Context, context.CancelFunc) {

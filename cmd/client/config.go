@@ -23,6 +23,7 @@ type Config struct {
 	Alias        string
 	SecretKey    string
 	Mnemonic     string
+	WalletPath string
 	AccountIndex uint
 	Channel      channelConfig
 	Node         nodeConfig

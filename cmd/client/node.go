@@ -21,7 +21,8 @@ import (
 	_ "perun.network/go-perun/backend/ethereum" // backend init
 	ethchannel "perun.network/go-perun/backend/ethereum/channel"
 	ethwallet "perun.network/go-perun/backend/ethereum/wallet"
-	phd "perun.network/go-perun/backend/ethereum/wallet/hd"
+	// phd "perun.network/go-perun/backend/ethereum/wallet/hd"
+	pkeystore "perun.network/go-perun/backend/ethereum/wallet/keystore"
 	"perun.network/go-perun/channel"
 	"perun.network/go-perun/client"
 	"perun.network/go-perun/log"
@@ -48,11 +49,11 @@ type node struct {
 	dialer *simple.Dialer
 
 	// Account for signing on-chain TX. Currently also the Perun-ID.
-	onChain *phd.Account
+	onChain *pkeystore.Account
 	// Account for signing off-chain TX. Currently one Account for all
 	// state channels, later one we want one Account per Channel.
 	offChain wallet.Account
-	wallet   *phd.Wallet
+	wallet   *pkeystore.Wallet
 
 	adjudicator channel.Adjudicator
 	adjAddr     common.Address
@@ -605,11 +606,10 @@ func (n *node) Settle(args []string) (string, error) {
 	}
 
 	// Cleanup.
-	peer.ch.ch.Close()
 
-	// if err := peer.ch.ch.Close(); err != nil {
-	// 	return errors.WithMessage(err, "channel closing")
-	// }
+	if err := peer.ch.ch.Close(); err != nil {
+		return "Error closing channel with " + alias, err
+	}
 
 	peer.ch.log.Debug("Removing channel")
 	peer.ch = nil

@@ -1,14 +1,27 @@
 """Create config files for the network.
 Make sure ganache is already running on localhost:8545.
-Run it with ganache-cli -m "pistol kiwi shrug future ozone ostrich match remove crucial oblige cream critic" --accounts 10 --block-time 5 -e 1000.
+Run it with  ganache-cli -m "pistol kiwi shrug future ozone ostrich match remove crucial oblige cream critic" --account_keys_path keys.json --accounts 55 --block-time 5 --gasPrice 100000000000.
 With the flag --accounts the number of accounts to be created can be specified. The config files will be created for these accounts."""
 import json
 import yaml
 import copy
 import ipaddress
-from web3 import Web3
+from eth_account import Account
+from web3 import Web3, exceptions
 
 DOCKERIZED = False
+MNEMONIC = "pistol kiwi shrug future ozone ostrich match remove crucial oblige cream critic"
+Account.enable_unaudited_hdwallet_features()
+
+
+def get_private_key(address):
+    address = address.lower()
+    # Load the JSON file
+    with open('keys.json', 'r') as file:
+        data = json.load(file)
+        private_key = data['private_keys'][address]
+        return data['private_keys'][address]
+
 
 def remove_quotes(file_path):
     """Remove the "'" characters from the config files"""
@@ -52,6 +65,9 @@ def generate_peer_and_network_files():
 
         config_template['alias'] = f"peer_{i}"
         config_template['accountIndex'] = i
+        config_template["walletPath"] = f"/tmp/peer_{i}_wallet"
+        config_template['secretKey'] = get_private_key(account)
+
         config_template['node']['port'] = 5750 + i
         config_template['node']['apiPort'] = 8081 + i
         config_template['node']['persistencePath'] = f"/tmp/peer_{i}"
@@ -117,7 +133,7 @@ def generate_docker_compose_file(network, subnet, min_ip, max_ip):
         peer_config["hostname"] = config["hostname"]
         peer_config["ports"] = [f"{config['port']}:{config['port']}", f"{config['apiport']}:{config['apiport']}"]
         peer_config["depends_on"] = ["ganache"]
-        peer_config["command"] = f'sh -c "./wait-for-it.sh ganache:8545 &&./app-channel demo --config config/{peer}.yaml --log-level trace --log-file logs/{peer}.log"'
+        peer_config["command"] = f'sh -c "./wait-for-it.sh 127.0.0.1:8545 &&./app-channel demo --config config/{peer}.yaml --log-level trace --log-file logs/{peer}.log"'
         # Add dependency on peer_0 if it is not peer_0
         # if peer != "peer_0":
         #     peer_config["depends_on"].append("peer_0")
