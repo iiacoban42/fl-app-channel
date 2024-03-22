@@ -26,6 +26,11 @@ const numParts = 2
 
 type FieldValue uint8
 
+// type IPFSData struct {
+// 	Hash string
+// 	len uint8
+// }
+
 const (
 	notSet FieldValue = iota
 	player1
@@ -121,6 +126,24 @@ func writeUInt8Array(w io.Writer, v []uint8) error {
 	return err
 }
 
+func writeString(w io.Writer, s string, slen uint8) error {
+	n := uint8(len([]byte(s)))
+	if n == slen {
+		_, err := w.Write([]byte(s))
+		return err
+	}
+	buf := make([]byte, slen)
+	_, err := w.Write(buf)
+	return err
+}
+
+
+func readString(r io.Reader, n uint8) (string, error) {
+	buf := make([]byte, n)
+	_, err := io.ReadFull(r, buf)
+	return string(buf), err
+}
+
 func makeFieldValueArray(a []uint8) []FieldValue {
 	b := make([]FieldValue, len(a))
 	for i := range b {
@@ -128,6 +151,7 @@ func makeFieldValueArray(a []uint8) []FieldValue {
 	}
 	return b
 }
+
 
 // func makeUInt8Array(a []FieldValue) []uint8 {
 // 	b := make([]uint8, len(a))

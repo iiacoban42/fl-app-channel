@@ -31,8 +31,8 @@ func newFLChannel(ch *client.Channel) *FLChannel {
 // }
 
 // Set sends a game move to the channel peer.
-func (g *FLChannel) Set(model, numberOfRounds, weight, accuracy, loss int) error {
-	g.log.Debugf("Setting state: %s", model)
+func (g *FLChannel) Set(model string, numberOfRounds int, weight, accuracy, loss int) error {
+	g.log.Debugf("Setting state: %s, %d, %s, %d, %d", model, numberOfRounds, weight, accuracy, loss)
 	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.Timeout)
 	defer cancel()
 
@@ -51,7 +51,7 @@ func (g *FLChannel) Set(model, numberOfRounds, weight, accuracy, loss int) error
 }
 
 // ForceSet registers a game move on-chain.
-func (g *FLChannel) ForceSet(model, numberOfRounds, weight, accuracy, loss int) error {
+func (g *FLChannel) ForceSet(model string, numberOfRounds int, weight, accuracy, loss int) error {
 	g.log.Debugf("Force setting state: %s", model)
 	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.Timeout)
 	defer cancel()
@@ -94,6 +94,17 @@ func (g *FLChannel) ForceSet(model, numberOfRounds, weight, accuracy, loss int) 
 // 	return nil
 // }
 
+
+// func (g *FLChannel) Settle() {
+// 	// Channel should be finalized through last ("winning") move.
+// 	// No need to set `isFinal` here.
+// 	err := g.ch.Settle(context.TODO(), false)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// Cleanup.
+// 	g.ch.Close()
+// }
 
 func (g *FLChannel) GetBalances() (our, other *big.Int) {
 	bals := stateBals(g.ch.State())

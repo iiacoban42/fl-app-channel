@@ -451,10 +451,12 @@ func (n *node) Set(args []string) (string, error) {
 		return "error connect to peer first", errors.Errorf("connect to peer first")
 	}
 
-	model, err := strconv.Atoi(args[1])
-	if err != nil {
-		return "error converting model string to int", errors.WithMessage(err, "converting model string to int")
-	}
+	// model, err := strconv.Atoi(args[1])
+	// if err != nil {
+	// 	return "error converting model string to int", errors.WithMessage(err, "converting model string to int")
+	// }
+
+	model := args[1]
 
 	numberOfRounds, err := strconv.Atoi(args[2])
 	if err != nil {
@@ -465,6 +467,8 @@ func (n *node) Set(args []string) (string, error) {
 	if err != nil {
 		return "error converting weight string to int", errors.WithMessage(err, "converting weight string to int")
 	}
+
+	// weight := args[3]
 
 	accuracy, err := strconv.Atoi(args[4])
 	if err != nil {
@@ -543,10 +547,12 @@ func (n *node) ForceSet(args []string) (string, error) {
 		return "connect to peer first", errors.Errorf("connect to peer first")
 	}
 
-	model, err := strconv.Atoi(args[1])
-	if err != nil {
-		return "converting model string to int", errors.WithMessage(err, "converting model string to int")
-	}
+	// model, err := strconv.Atoi(args[1])
+	// if err != nil {
+	// 	return "converting model string to int", errors.WithMessage(err, "converting model string to int")
+	// }
+
+	model := args[1]
 
 	numberOfRounds, err := strconv.Atoi(args[2])
 	if err != nil {
@@ -557,6 +563,8 @@ func (n *node) ForceSet(args []string) (string, error) {
 	if err != nil {
 		return "converting weight string to int", errors.WithMessage(err, "converting weight string to int")
 	}
+
+	// weight := args[3]
 
 	accuracy, err := strconv.Atoi(args[4])
 	if err != nil {

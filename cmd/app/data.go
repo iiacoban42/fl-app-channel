@@ -10,14 +10,10 @@ import (
 )
 
 // FLAppData is the app data struct.
-// Grid:
-// 0 1 2
-// 3 4 5
-// 6 7 8
 type FLAppData struct {
 	NextActor uint8
-	// Grid      [9]FieldValue
-	Model 	  uint8
+	CIDLen   uint8
+	Model 	  string
 	NumberOfRounds uint8
 	Round 	   uint8
 	RoundPhase uint8
@@ -29,6 +25,7 @@ type FLAppData struct {
 func (d *FLAppData) String() string {
 	var b bytes.Buffer
 	fmt.Fprintf(&b, "model: %v\n", d.Model)
+	fmt.Fprintf(&b, "CIDLen: %v\n", d.CIDLen)
 	fmt.Fprintf(&b, "numberOfRounds: %v\n", d.NumberOfRounds)
 	fmt.Fprintf(&b, "round: %v\n", d.Round)
 	fmt.Fprintf(&b, "roundPhase: %v\n", d.RoundPhase)
@@ -46,7 +43,12 @@ func (d *FLAppData) Encode(w io.Writer) error {
 		return errors.WithMessage(err, "writing actor")
 	}
 
-	err = writeUInt8(w, d.Model)
+	err = writeUInt8(w, d.CIDLen)
+	if err != nil {
+		return errors.WithMessage(err, "writing CIDLen")
+	}
+
+	err = writeString(w, d.Model, d.CIDLen)
 	if err != nil {
 		return errors.WithMessage(err, "writing model")
 	}
@@ -90,7 +92,7 @@ func (d *FLAppData) Clone() channel.Data {
 	return &_d
 }
 
-func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index) error {
+func (d *FLAppData) Set(model string, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index) error {
 	actor := uint8safe(uint16(actorIdx))
 	if d.NextActor != actor {
 		return fmt.Errorf("invalid actor: expected %v, got %v", actor, d.NextActor)
@@ -101,7 +103,8 @@ func (d *FLAppData) Set(model, numberOfRounds, weight, accuracy, loss int, actor
 		if d.Round != 0 {
 			return fmt.Errorf("invalid round: round cannot be %v in phase %v", d.Round, d.RoundPhase)
 		}
-		d.Model = uint8safe(uint16(model)) // set the model
+		d.Model = model // set the model
+		d.CIDLen = uint8(len(model))
 		d.NumberOfRounds = uint8safe(uint16(numberOfRounds)) // set the number of rounds
 		d.RoundPhase = 1
 

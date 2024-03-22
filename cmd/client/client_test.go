@@ -83,13 +83,13 @@ func TestNodes(t *testing.T) {
 
 	// peer_0 sends to peer_1 and peer_1 to peer_0.
 	t.Log("Server: Init FL")
-	require.NoError(t, peer_0.sendCommand("set peer_1 1 1 0 0 0\n"))
+	require.NoError(t, peer_0.sendCommand("set peer_1 model1 1 0 0 0\n"))
 	time.Sleep(1 * time.Second)
 	t.Log("Client: Set Weight")
-	require.NoError(t, peer_1.sendCommand("set peer_0 1 1 10 0 0\n"))
+	require.NoError(t, peer_1.sendCommand("set peer_0 model1 1 10 0 0\n"))
 	time.Sleep(1 * time.Second)
 	t.Log("Server: Aggregate and Evaluate")
-	require.NoError(t, peer_0.sendCommand("set peer_1 1 1 10 66 34\n"))
+	require.NoError(t, peer_0.sendCommand("set peer_1 model1 1 10 66 34\n"))
 	time.Sleep(1 * time.Second)
 	// round 2
 	// t.Log("Client: Set Weight")

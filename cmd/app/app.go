@@ -45,6 +45,7 @@ func (a *FLApp) Def() wallet.Address {
 func (a *FLApp) InitData(firstActor channel.Index) *FLAppData {
 	return &FLAppData{
 		NextActor: uint8(firstActor),
+		// Model: make([]byte, 64),
 	}
 }
 
@@ -58,7 +59,12 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading actor")
 	}
 
-	d.Model, err = readUInt8(r)
+	d.CIDLen, err = readUInt8(r)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading CIDLen")
+	}
+
+	d.Model, err = readString(r, d.CIDLen)
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading model")
 	}
@@ -158,8 +164,11 @@ func (a *FLApp) ValidInit(p *channel.Params, s *channel.State) error {
 	return nil
 }
 
-
 func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
+	//print fromData
+	// fmt.Println("fromData: %v", fromData.String())
+	// //print toData
+	// fmt.Println("toData: %v", toData.String())
 
 	if fromData.NextActor == uint8(0) { // Server conditions
 		if fromData.RoundPhase != 0 && toData.Round != fromData.Round+1 {
@@ -187,14 +196,14 @@ func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
 }
 
 func checkClientTransitionConstraints(fromData, toData *FLAppData) error {
-	if fromData.NextActor == uint8(1){ //Client conditions
-		if fromData.Round != toData.Round{
+	if fromData.NextActor == uint8(1) { //Client conditions
+		if fromData.Round != toData.Round {
 			return fmt.Errorf("actor: %v cannot override round: expected %v, got %v", fromData.NextActor, fromData.Round, toData.Round)
 		}
-		if !reflect.DeepEqual(fromData.Accuracy, toData.Accuracy){
+		if !reflect.DeepEqual(fromData.Accuracy, toData.Accuracy) {
 			return fmt.Errorf("actor: %v cannot override accuracy: expected %v, got %v", fromData.NextActor, fromData.Accuracy, toData.Accuracy)
 		}
-		if !reflect.DeepEqual(fromData.Loss, toData.Loss){
+		if !reflect.DeepEqual(fromData.Loss, toData.Loss) {
 			return fmt.Errorf("actor: %v cannot override loss: expected %v, got %v", fromData.NextActor, fromData.Loss, toData.Loss)
 		}
 
@@ -286,15 +295,13 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 	return nil
 }
 
-
-func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index) error {
+func (a *FLApp) Set(s *channel.State, model string, numberOfRounds int, weight, accuracy, loss int, actorIdx channel.Index) error {
 	d, ok := s.Data.(*FLAppData)
 	if !ok {
 		return fmt.Errorf("invalid data type: %T", d)
 	}
 
 	fmt.Println("🔁 Setting state")
-
 
 	err := d.Set(model, numberOfRounds, weight, accuracy, loss, actorIdx)
 	if err != nil {
@@ -307,7 +314,7 @@ func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, l
 	if checkClientReward := d.checkClientReward(); checkClientReward {
 		fmt.Println("Client rewarded")
 		s.Balances = payCLientForContrib(s.Balances)
-		fmt.Printf("💰 Sent payment. New balance: [My: %v Ξ, Peer: %v Ξ]\n", s.Balances[0][1],  s.Balances[0][0])
+		fmt.Printf("💰 Sent payment. New balance: [My: %v Ξ, Peer: %v Ξ]\n", s.Balances[0][1], s.Balances[0][0])
 
 	}
 
@@ -319,5 +326,3 @@ func (a *FLApp) Set(s *channel.State, model, numberOfRounds, weight, accuracy, l
 	}
 	return nil
 }
-
-
