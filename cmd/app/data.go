@@ -17,7 +17,7 @@ type FLAppData struct {
 	NumberOfRounds uint8
 	Round 	   uint8
 	RoundPhase uint8
-	Weight 	  [3]uint8
+	Weight 	  string
 	Accuracy  [3]uint8
 	Loss 	  [3]uint8
 }
@@ -68,7 +68,7 @@ func (d *FLAppData) Encode(w io.Writer) error {
 		return errors.WithMessage(err, "writing roundPhase")
 	}
 
-	err = writeUInt8Array(w, makeUInt8Array(d.Weight[:]))
+	err = writeString(w, d.Weight, d.CIDLen)
 	if err != nil {
 		return errors.WithMessage(err, "writing weight")
 	}
@@ -92,7 +92,7 @@ func (d *FLAppData) Clone() channel.Data {
 	return &_d
 }
 
-func (d *FLAppData) Set(model string, numberOfRounds, weight, accuracy, loss int, actorIdx channel.Index) error {
+func (d *FLAppData) Set(model string, numberOfRounds int, weight string, accuracy, loss int, actorIdx channel.Index) error {
 	actor := uint8safe(uint16(actorIdx))
 	if d.NextActor != actor {
 		return fmt.Errorf("invalid actor: expected %v, got %v", actor, d.NextActor)
@@ -107,9 +107,10 @@ func (d *FLAppData) Set(model string, numberOfRounds, weight, accuracy, loss int
 		d.CIDLen = uint8(len(model))
 		d.NumberOfRounds = uint8safe(uint16(numberOfRounds)) // set the number of rounds
 		d.RoundPhase = 1
+		d.Weight = model
 
 	} else if d.RoundPhase == 1 { //update then waiting for aggregation
-		d.Weight[d.Round] = uint8safe(uint16(weight))
+		d.Weight = weight
 		d.RoundPhase = 2
 
 	}else if d.RoundPhase == 2 { // aggregate then waiting for updates

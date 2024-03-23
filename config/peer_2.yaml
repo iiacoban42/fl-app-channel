@@ -10,11 +10,11 @@ channel:
 node:
   ip: 0.0.0.0
   port: 5752
-  apiPort: 8083
   dialTimeout: 30s
   handleTimeout: 30s
   reconnectTimeout: 20s
   persistencePath: /tmp/peer_2
+  apiPort: 8083
 chain:
   url: ws://127.0.0.1:8545
   contractsetup: validate
@@ -27,3 +27,5 @@ chain:
 log:
   level: warn
   file: logs/peer_2.log
+walletPath: /tmp/peer_2_wallet
+secretKey: 0xd035a0628e729dd1d8652ed0217adf2af5a744067f35db071bbef09e97e3c1d7

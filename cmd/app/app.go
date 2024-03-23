@@ -84,11 +84,10 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading roundPhase")
 	}
 
-	weight, err := readUInt8Array(r, len(d.Weight))
+	d.Weight, err = readString(r, d.CIDLen)
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading weight")
 	}
-	copy(d.Weight[:], weight)
 
 	accuracy, err := readUInt8Array(r, len(d.Accuracy))
 	if err != nil {
@@ -175,7 +174,7 @@ func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
 			return fmt.Errorf("actor: %v must increment round: expected %v, got %v", fromData.NextActor, fromData.Round+1, toData.Round)
 		}
 
-		if !reflect.DeepEqual(fromData.Weight, toData.Weight){
+		if fromData.RoundPhase != 0 && !reflect.DeepEqual(fromData.Weight, toData.Weight){
 			return fmt.Errorf("actor: %v cannot override weight: expected %v, got %v", fromData.NextActor, fromData.Weight, toData.Weight)
 		}
 
@@ -207,11 +206,11 @@ func checkClientTransitionConstraints(fromData, toData *FLAppData) error {
 			return fmt.Errorf("actor: %v cannot override loss: expected %v, got %v", fromData.NextActor, fromData.Loss, toData.Loss)
 		}
 
-		if !equalExcept(fromData.Weight[:], toData.Weight[:], int(toData.Round)){
-			return fmt.Errorf("actor: %v cannot override weights outside current round: expected %v, got %v", fromData.NextActor, fromData.Weight, toData.Weight)
-		}
+		// if !equalExcept(fromData.Weight[:], toData.Weight[:], int(toData.Round)){
+		// 	return fmt.Errorf("actor: %v cannot override weights outside current round: expected %v, got %v", fromData.NextActor, fromData.Weight, toData.Weight)
+		// }
 
-		if toData.Weight[fromData.Round] == 0 { //weight is not set
+		if fromData.RoundPhase == 1 && toData.Weight == fromData.Weight { //weight is not set
 			return fmt.Errorf("actor: %v cannot skip weight %v -> %v", fromData.NextActor, fromData.Weight, toData.Weight)
 		}
 	}
@@ -295,7 +294,7 @@ func (a *FLApp) ValidTransition(params *channel.Params, from, to *channel.State,
 	return nil
 }
 
-func (a *FLApp) Set(s *channel.State, model string, numberOfRounds int, weight, accuracy, loss int, actorIdx channel.Index) error {
+func (a *FLApp) Set(s *channel.State, model string, numberOfRounds int, weight string, accuracy, loss int, actorIdx channel.Index) error {
 	d, ok := s.Data.(*FLAppData)
 	if !ok {
 		return fmt.Errorf("invalid data type: %T", d)

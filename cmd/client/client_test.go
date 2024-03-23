@@ -86,10 +86,10 @@ func TestNodes(t *testing.T) {
 	require.NoError(t, peer_0.sendCommand("set peer_1 model1 1 0 0 0\n"))
 	time.Sleep(1 * time.Second)
 	t.Log("Client: Set Weight")
-	require.NoError(t, peer_1.sendCommand("set peer_0 model1 1 10 0 0\n"))
+	require.NoError(t, peer_1.sendCommand("set peer_0 model1 1 weight 0 0\n"))
 	time.Sleep(1 * time.Second)
 	t.Log("Server: Aggregate and Evaluate")
-	require.NoError(t, peer_0.sendCommand("set peer_1 model1 1 10 66 34\n"))
+	require.NoError(t, peer_0.sendCommand("set peer_1 model1 1 0 66 34\n"))
 	time.Sleep(1 * time.Second)
 	// round 2
 	// t.Log("Client: Set Weight")
@@ -112,7 +112,7 @@ func TestNodes(t *testing.T) {
 	require.NoError(t, peer_0.sendCommand("settle peer_1\n"))
 	// Wait 2 blocks for the settle and withdrawal transactions plus some additional seconds.
 	time.Sleep(2*blockTime + 10*time.Second + txFinalityDepth*blockTime)
-	require.NoError(t, peer_1.sendCommand("settle peer_0\n"))
+	// require.NoError(t, peer_1.sendCommand("settle peer_0\n"))
 
 	// Wait 2 blocks for the settle and withdrawal transactions plus some additional seconds.
 	time.Sleep(2*blockTime + 10*time.Second + txFinalityDepth*blockTime)

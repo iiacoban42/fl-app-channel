@@ -463,12 +463,12 @@ func (n *node) Set(args []string) (string, error) {
 		return "error converting numberOfRounds string to int", errors.WithMessage(err, "converting numberOfRounds string to int")
 	}
 
-	weight, err := strconv.Atoi(args[3])
-	if err != nil {
-		return "error converting weight string to int", errors.WithMessage(err, "converting weight string to int")
-	}
+	// weight, err := strconv.Atoi(args[3])
+	// if err != nil {
+	// 	return "error converting weight string to int", errors.WithMessage(err, "converting weight string to int")
+	// }
 
-	// weight := args[3]
+	weight := args[3]
 
 	accuracy, err := strconv.Atoi(args[4])
 	if err != nil {
@@ -559,12 +559,12 @@ func (n *node) ForceSet(args []string) (string, error) {
 		return "converting numberOfRounds string to int", errors.WithMessage(err, "converting numberOfRounds string to int")
 	}
 
-	weight, err := strconv.Atoi(args[3])
-	if err != nil {
-		return "converting weight string to int", errors.WithMessage(err, "converting weight string to int")
-	}
+	// weight, err := strconv.Atoi(args[3])
+	// if err != nil {
+	// 	return "converting weight string to int", errors.WithMessage(err, "converting weight string to int")
+	// }
 
-	// weight := args[3]
+	weight := args[3]
 
 	accuracy, err := strconv.Atoi(args[4])
 	if err != nil {

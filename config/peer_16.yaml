@@ -1,7 +1,7 @@
-alias: peer_1
+alias: peer_16
 mnemonic: pistol kiwi shrug future ozone ostrich match remove crucial oblige cream
   critic
-accountIndex: 1
+accountIndex: 16
 channel:
   timeout: 30s
   fundtimeout: 30s
@@ -9,12 +9,12 @@ channel:
   challengeDurationSec: 60
 node:
   ip: 0.0.0.0
-  port: 5751
+  port: 5766
   dialTimeout: 30s
   handleTimeout: 30s
   reconnectTimeout: 20s
-  persistencePath: /tmp/peer_1
-  apiPort: 8082
+  persistencePath: /tmp/peer_16
+  apiPort: 8097
 chain:
   url: ws://127.0.0.1:8545
   contractsetup: validate
@@ -26,6 +26,6 @@ chain:
   ID: 1337
 log:
   level: warn
-  file: logs/peer_1.log
-walletPath: /tmp/peer_1_wallet
-secretKey: 0xb5dc82fc5f4d82b59a38ac963a15eaaedf414f496a037bb4a52310915ac84097
+  file: logs/peer_16.log
+walletPath: /tmp/peer_16_wallet
+secretKey: 0x97f2fbea029514788d2a4788f92fda1d214a508254ace92d554e723226f37858

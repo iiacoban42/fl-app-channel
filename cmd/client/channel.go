@@ -31,7 +31,7 @@ func newFLChannel(ch *client.Channel) *FLChannel {
 // }
 
 // Set sends a game move to the channel peer.
-func (g *FLChannel) Set(model string, numberOfRounds int, weight, accuracy, loss int) error {
+func (g *FLChannel) Set(model string, numberOfRounds int, weight string, accuracy, loss int) error {
 	g.log.Debugf("Setting state: %s, %d, %s, %d, %d", model, numberOfRounds, weight, accuracy, loss)
 	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.Timeout)
 	defer cancel()
@@ -51,7 +51,7 @@ func (g *FLChannel) Set(model string, numberOfRounds int, weight, accuracy, loss
 }
 
 // ForceSet registers a game move on-chain.
-func (g *FLChannel) ForceSet(model string, numberOfRounds int, weight, accuracy, loss int) error {
+func (g *FLChannel) ForceSet(model string, numberOfRounds int, weight string, accuracy, loss int) error {
 	g.log.Debugf("Force setting state: %s", model)
 	ctx, cancel := context.WithTimeout(context.Background(), config.Channel.Timeout)
 	defer cancel()
