@@ -48,11 +48,6 @@ func (d *FLAppData) Encode(w io.Writer) error {
 		return errors.WithMessage(err, "writing CIDLen")
 	}
 
-	err = writeString(w, d.Model, d.CIDLen)
-	if err != nil {
-		return errors.WithMessage(err, "writing model")
-	}
-
 	err = writeUInt8(w, d.NumberOfRounds)
 	if err != nil {
 		return errors.WithMessage(err, "writing numberOfRounds")
@@ -68,6 +63,11 @@ func (d *FLAppData) Encode(w io.Writer) error {
 		return errors.WithMessage(err, "writing roundPhase")
 	}
 
+	err = writeString(w, d.Model, d.CIDLen)
+	if err != nil {
+		return errors.WithMessage(err, "writing model")
+	}
+
 	err = writeString(w, d.Weight, d.CIDLen)
 	if err != nil {
 		return errors.WithMessage(err, "writing weight")
@@ -79,7 +79,11 @@ func (d *FLAppData) Encode(w io.Writer) error {
 	}
 
 	err = writeUInt8Array(w, makeUInt8Array(d.Loss[:]))
+
 	return errors.WithMessage(err, "writing loss")
+
+
+
 
 	// err = writeUInt8Array(w, makeUInt8Array(d.Grid[:]))
 	// return errors.WithMessage(err, "writing grid")
@@ -116,6 +120,7 @@ func (d *FLAppData) Set(model string, numberOfRounds int, weight string, accurac
 	}else if d.RoundPhase == 2 { // aggregate then waiting for updates
 		d.Accuracy[d.Round] = uint8safe(uint16(accuracy))
 		d.Loss[d.Round] = uint8safe(uint16(loss))
+		d.Model = model
 
 		if d.Round == d.NumberOfRounds - 1 {
 			d.RoundPhase = 3

@@ -64,11 +64,6 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading CIDLen")
 	}
 
-	d.Model, err = readString(r, d.CIDLen)
-	if err != nil {
-		return nil, errors.WithMessage(err, "reading model")
-	}
-
 	d.NumberOfRounds, err = readUInt8(r)
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading numberOfRounds")
@@ -82,6 +77,11 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 	d.RoundPhase, err = readUInt8(r)
 	if err != nil {
 		return nil, errors.WithMessage(err, "reading roundPhase")
+	}
+
+	d.Model, err = readString(r, d.CIDLen)
+	if err != nil {
+		return nil, errors.WithMessage(err, "reading model")
 	}
 
 	d.Weight, err = readString(r, d.CIDLen)
@@ -100,6 +100,7 @@ func (a *FLApp) DecodeData(r io.Reader) (channel.Data, error) {
 		return nil, errors.WithMessage(err, "reading loss")
 	}
 	copy(d.Loss[:], loss)
+
 
 	// grid, err := readUInt8Array(r, len(d.Grid))
 	// if err != nil {
@@ -170,6 +171,11 @@ func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
 	// fmt.Println("toData: %v", toData.String())
 
 	if fromData.NextActor == uint8(0) { // Server conditions
+
+		if fromData.Model == toData.Model {
+			return fmt.Errorf("actor: %v cannot skip model", fromData.NextActor)
+		}
+
 		if fromData.RoundPhase != 0 && toData.Round != fromData.Round+1 {
 			return fmt.Errorf("actor: %v must increment round: expected %v, got %v", fromData.NextActor, fromData.Round+1, toData.Round)
 		}
@@ -196,6 +202,9 @@ func checkServerTransitionConstraints(fromData, toData *FLAppData) error {
 
 func checkClientTransitionConstraints(fromData, toData *FLAppData) error {
 	if fromData.NextActor == uint8(1) { //Client conditions
+		if fromData.Model != toData.Model {
+			return fmt.Errorf("actor: %v cannot override model: expected %v, got %v", fromData.NextActor, fromData.Model, toData.Model)
+		}
 		if fromData.Round != toData.Round {
 			return fmt.Errorf("actor: %v cannot override round: expected %v, got %v", fromData.NextActor, fromData.Round, toData.Round)
 		}
@@ -218,9 +227,6 @@ func checkClientTransitionConstraints(fromData, toData *FLAppData) error {
 }
 
 func checkFLRoundTransitionConstraints(fromData, toData *FLAppData) error {
-	if fromData.RoundPhase != 0 && fromData.Model != toData.Model {
-		return fmt.Errorf("cannot override model: expected %v, got %v", fromData.Model, toData.Model)
-	}
 
 	if fromData.RoundPhase != 0 && fromData.NumberOfRounds != toData.NumberOfRounds {
 		return fmt.Errorf("cannot override number of rounds: expected %v, got %v", fromData.NumberOfRounds, toData.NumberOfRounds)

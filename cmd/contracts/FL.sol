@@ -25,12 +25,14 @@ contract FLApp is App {
     uint8 constant actorDataLength = 1;
     uint8 constant numParts = 2;
 
-    uint8 constant modelIndex = 1;
-    uint8 constant numberOfRoundsIndex = modelIndex + 1;
+    uint8 constant cidlenindex = 1;
+    uint8 constant cidlen = 46;
+
+    uint8 constant numberOfRoundsIndex = cidlenindex + 1;
     uint8 constant roundIndex = numberOfRoundsIndex + 1;
     uint8 constant roundPhaseIndex = roundIndex + 1;
-    uint8 constant weightIndex = roundPhaseIndex + 1;
-    uint8 constant threshold = 60;
+    uint8 constant modelIndex = roundPhaseIndex + 1;
+    uint8 constant weightIndex = modelIndex + cidlen;
 
     /**
      * @notice ValidTransition checks if there was a valid transition between two states.
@@ -53,31 +55,32 @@ contract FLApp is App {
         require((actorIndex + 1) % numParts == uint8(to.appData[actorDataIndex]), "next actor");
 
         if (uint8(from.appData[roundPhaseIndex]) != 0){
-            require(from.appData[modelIndex] == to.appData[modelIndex], "model changed");
             require(from.appData[numberOfRoundsIndex] == to.appData[numberOfRoundsIndex], "round changed");
         }
 
         uint8 numRounds = uint8(to.appData[numberOfRoundsIndex]);
-
-        uint8 accuracyIndex = weightIndex + numRounds;
+        uint8 accuracyIndex = weightIndex + cidlen;
         uint8 lossIndex = accuracyIndex + numRounds;
-        uint8 appDataLength = lossIndex + numRounds;
 
-        require(to.appData.length == appDataLength, "data length");
+        // // uint8 appDataLength = lossIndex + numRounds;
+
+        // // // require(to.appData.length == from.appData.length, "data length");
 
         require(uint8(to.appData[roundIndex]) <= uint8(to.appData[numberOfRoundsIndex]), "round out of bounds");
 
 
-        // // check server constraints
+        // // // check server constraints
         if (actorIndex == 0) {
-            require(equalBytes(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds]), "actor cannot override weights");
 
-            require(equalExcept(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds], uint8(from.appData[roundIndex])), "actor cannot override accuracy outside current round");
+            if (uint8(from.appData[roundPhaseIndex]) != 0){
+                require(!equalBytes(from.appData[modelIndex:modelIndex+cidlen], to.appData[modelIndex:modelIndex+cidlen]), "actor cannot skip model");
 
-            require(equalExcept(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds], uint8(from.appData[roundIndex])), "actor cannot override loss outside current round ");
+                require(equalBytes(from.appData[weightIndex:weightIndex+cidlen], to.appData[weightIndex:weightIndex+cidlen]), "actor cannot override weights");
 
+                require(equalExcept(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds], uint8(from.appData[roundIndex])), "actor cannot override accuracy outside current round");
 
-            if (uint8(from.appData[roundPhaseIndex]) != 0){ // unless we are in init phase
+                require(equalExcept(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds], uint8(from.appData[roundIndex])), "actor cannot override loss outside current round ");
+
                 require(uint8(to.appData[roundIndex]) == uint8(from.appData[roundIndex]) + uint8(1), "actor must increment round");
 
                 require(uint8(to.appData[accuracyIndex+uint8(from.appData[roundIndex])]) != 0 || uint8(to.appData[lossIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip accuracy and loss");
@@ -85,17 +88,17 @@ contract FLApp is App {
 
         }
 
-        // check client constraints
+        // // check client constraints
         if (actorIndex == 1) {
+            require(equalBytes(from.appData[modelIndex:modelIndex+cidlen], to.appData[modelIndex:modelIndex+cidlen]), "actor cannot change model");
+
             require(uint8(from.appData[roundIndex]) == uint8(to.appData[roundIndex]), "actor cannot increment round");
 
             require(equalBytes(from.appData[accuracyIndex:accuracyIndex+numRounds], to.appData[accuracyIndex:accuracyIndex+numRounds]), "actor cannot override accuracy");
 
             require(equalBytes(from.appData[lossIndex:lossIndex+numRounds], to.appData[lossIndex:lossIndex+numRounds]), "actor cannot override loss");
 
-            require(equalExcept(from.appData[weightIndex:weightIndex+numRounds], to.appData[weightIndex:weightIndex+numRounds], uint8(to.appData[roundIndex])), "actor cannot override weight outside current round");
-
-            require(uint8(to.appData[weightIndex+uint8(from.appData[roundIndex])]) != 0, "actor cannot skip weight");
+            require(!equalBytes(to.appData[weightIndex:weightIndex+cidlen], from.appData[weightIndex:weightIndex+cidlen]) , "actor cannot skip weight");
         }
 
         // Test final state.

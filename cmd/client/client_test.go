@@ -82,28 +82,29 @@ func TestNodes(t *testing.T) {
 	time.Sleep(blockTime + txFinalityDepth*blockTime) // Wait 1 block for funding transactions to be confirmed.
 
 	// peer_0 sends to peer_1 and peer_1 to peer_0.
+
 	t.Log("Server: Init FL")
-	require.NoError(t, peer_0.sendCommand("set peer_1 model1 1 0 0 0\n"))
+	require.NoError(t, peer_0.sendCommand("set peer_1 qmqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 1 0 0 0\n"))
 	time.Sleep(1 * time.Second)
 	t.Log("Client: Set Weight")
-	require.NoError(t, peer_1.sendCommand("set peer_0 model1 1 weight 0 0\n"))
+	require.NoError(t, peer_1.sendCommand("set peer_0 1mqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 1 1mqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 0 0\n"))
 	time.Sleep(1 * time.Second)
 	t.Log("Server: Aggregate and Evaluate")
-	require.NoError(t, peer_0.sendCommand("set peer_1 model1 1 0 66 34\n"))
+	require.NoError(t, peer_0.sendCommand("set peer_1 amqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 1 0 66 34\n"))
 	time.Sleep(1 * time.Second)
 	// round 2
 	// t.Log("Client: Set Weight")
-	// require.NoError(t, peer_1.sendCommand("set peer_0 1 3 11 66 34\n"))
+	// require.NoError(t, peer_1.sendCommand("set peer_0 amqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 3 2mQFKFA74GJ4t1xwQFx25HbpT7ZmuyE3MBpoxRu1hZyuaS 66 34\n"))
 	// time.Sleep(1 * time.Second)
 	// t.Log("Server: Aggregate and Evaluate")
-	// require.NoError(t, peer_0.sendCommand("set peer_1 1 3 11 67 33\n"))
+	// require.NoError(t, peer_0.sendCommand("set peer_1 bmqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 3 2mQFKFA74GJ4t1xwQFx25HbpT7ZmuyE3MBpoxRu1hZyuaS 67 33\n"))
 	// time.Sleep(1 * time.Second)
 	// // round 3
 	// t.Log("Client: Set Weight")
-	// require.NoError(t, peer_1.sendCommand("set peer_0 1 3 12 67 33\n"))
+	// require.NoError(t, peer_1.sendCommand("set peer_0 bmqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 3 3mQFKFA74GJ4t1xwQFx25HbpT7ZmuyE3MBpoxRu1hZyuaS 67 33\n"))
 	// time.Sleep(1 * time.Second)
 	// t.Log("Server: Aggregate and Evaluate")
-	// require.NoError(t, peer_0.sendCommand("set peer_1 1 3 12 68 32\n"))
+	// require.NoError(t, peer_0.sendCommand("set peer_1 cmqfkfa74gj4t1xwqfx25hbpt7zmuye3mbpoxru1hzyuas 3 3mQFKFA74GJ4t1xwQFx25HbpT7ZmuyE3MBpoxRu1hZyuaS 68 32\n"))
 	// time.Sleep(1 * time.Second)
 	// t.Log("Info")
 	// t.Log(peer_0.sendCommand("info\n"))
@@ -112,7 +113,7 @@ func TestNodes(t *testing.T) {
 	require.NoError(t, peer_0.sendCommand("settle peer_1\n"))
 	// Wait 2 blocks for the settle and withdrawal transactions plus some additional seconds.
 	time.Sleep(2*blockTime + 10*time.Second + txFinalityDepth*blockTime)
-	// require.NoError(t, peer_1.sendCommand("settle peer_0\n"))
+	require.NoError(t, peer_1.sendCommand("settle peer_0\n"))
 
 	// Wait 2 blocks for the settle and withdrawal transactions plus some additional seconds.
 	time.Sleep(2*blockTime + 10*time.Second + txFinalityDepth*blockTime)
