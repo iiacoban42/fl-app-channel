@@ -1,0 +1,314 @@
+time="2024-04-20T23:17:15+02:00" level=debug msg="Unlocking account 0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184"
+time="2024-04-20T23:17:15+02:00" level=debug msg="Set contracts" Adj=0x079557d7549d7D44F4b00b51d2C532674129ed51 Asset=0x923439be515b6A928cB9650d70000a9044e49E85
+time="2024-04-20T23:17:15+02:00" level=debug msg="Created new account 0x734d5b853d333F916eD1D4175F3F0C0CA1469168"
+time="2024-04-20T23:17:15+02:00" level=info msg="Generating account" off-chain=0x734d5b853d333F916eD1D4175F3F0C0CA1469168
+time="2024-04-20T23:17:15+02:00" level=trace msg="Listening for connections" host="0.0.0.0:5752"
+time="2024-04-20T23:17:15+02:00" level=info msg="Persistence disabled"
+time="2024-04-20T23:17:15+02:00" level=info msg="Listening on: 0.0.0.0:8083"
+time="2024-04-20T23:17:15+02:00" level=trace msg="Started handling API requests"
+time="2024-04-20T23:17:24+02:00" level=trace msg="API request: 'open,peer_0,10,10'"
+time="2024-04-20T23:17:24+02:00" level=trace msg=Connecting...
+time="2024-04-20T23:17:24+02:00" level=debug msg="Proposing channel"
+time="2024-04-20T23:17:24+02:00" level=trace msg="Enabling version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:17:24+02:00" level=debug msg="Publishing message: LedgerChannelProposal: &{BaseChannelProposal:{ChallengeDuration:60 NonceShare:[216 50 238 100 59 243 6 236 237 129 33 233 221 127 171 80 234 220 57 168 231 28 235 198 159 102 40 197 205 126 132 85] App:0xc0003109b0 InitData:model: \nCIDLen: 0\nnumberOfRounds: 0\nround: 0\nroundPhase: 0\nweight: \naccuracy: [0 0 0]\nloss: [0 0 0]\nNext actor: 0\n InitBals:0xc0002420a0 FundingAgreement:[[+10000000000000000000 +10000000000000000000]]} Participant:0x734d5b853d333F916eD1D4175F3F0C0CA1469168 Peers:[0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 0x2EE1ac154435f542ECEc55C5b0367650d8A5343B]}" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:17:24+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:17:24+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:17:24+02:00" level=trace msg="EndpointRegistry.Get: peer not found, dialing..." id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:17:24+02:00" level=trace msg=EndpointRegistry.addEndpoint id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:17:24+02:00" level=debug msg="Unlocking account 0x734d5b853d333F916eD1D4175F3F0C0CA1469168"
+time="2024-04-20T23:17:24+02:00" level=trace msg="phase transition: InitActing->InitSigning" channel=a46b079bd867c53547fbc53ace03bab8ba2361f8cf7891bd9d7cdc418c19d391 id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:17:24+02:00" level=debug msg="channelConn: publishing message: ChannelUpdateAcc: &{ChannelID:[164 107 7 155 216 103 197 53 71 251 197 58 206 3 186 184 186 35 97 248 207 120 145 189 157 124 220 65 140 25 211 145] Version:0 Sig:[61 35 11 153 167 241 13 108 156 87 101 38 200 10 212 50 161 191 46 75 114 223 17 57 117 28 245 21 157 197 217 41 18 107 29 169 107 71 175 41 222 179 160 61 84 177 243 18 242 0 228 26 4 16 78 240 123 208 181 144 33 147 193 98 28]}" channel=a46b079bd867c53547fbc53ace03bab8ba2361f8cf7891bd9d7cdc418c19d391 id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:17:24+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:17:24+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:17:24+02:00" level=trace msg="EndpointRegistry.Get: peer connection established" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:17:24+02:00" level=trace msg="phase transition: InitSigning->Funding" channel=a46b079bd867c53547fbc53ace03bab8ba2361f8cf7891bd9d7cdc418c19d391 id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:17:24+02:00" level=debug msg="Funding Channel." channel=a46b079bd867c53547fbc53ace03bab8ba2361f8cf7891bd9d7cdc418c19d391
+time="2024-04-20T23:17:24+02:00" level=debug msg="Resistant Event sub started at block: 188"
+time="2024-04-20T23:17:24+02:00" level=debug msg="Resistant Event sub started at block: 188"
+time="2024-04-20T23:17:24+02:00" level=error msg="Could not fund asset" asset=0x923439be515b6A928cB9650d70000a9044e49E85 error="AssetHolderETH depositing: insufficient funds for gas * price + value"
+time="2024-04-20T23:17:24+02:00" level=trace msg="Event sub was faster than head sub, ignored" hash=0x17260f47ed1f08521de50b966fe6145e31e2fb2ce1a97c96393dd25ebb115d5b
+time="2024-04-20T23:17:24+02:00" level=trace msg="Event preliminary included" hash=0x17260f47ed1f08521de50b966fe6145e31e2fb2ce1a97c96393dd25ebb115d5b
+time="2024-04-20T23:17:24+02:00" level=trace msg="Received new block. From 188 to 189"
+time="2024-04-20T23:17:24+02:00" level=trace msg="Event included 1 time(s)" hash=0x17260f47ed1f08521de50b966fe6145e31e2fb2ce1a97c96393dd25ebb115d5b
+time="2024-04-20T23:17:29+02:00" level=trace msg="Received new block. From 189 to 190"
+time="2024-04-20T23:17:29+02:00" level=trace msg="Event included 2 time(s)" hash=0x17260f47ed1f08521de50b966fe6145e31e2fb2ce1a97c96393dd25ebb115d5b
+time="2024-04-20T23:17:34+02:00" level=trace msg="Received new block. From 190 to 191"
+time="2024-04-20T23:17:34+02:00" level=debug msg="Event final after 3 block(s)" hash=0x17260f47ed1f08521de50b966fe6145e31e2fb2ce1a97c96393dd25ebb115d5b
+time="2024-04-20T23:17:34+02:00" level=debug msg="peer[0]: got: 10000000000000000000, remaining for [0,1] = 0. N: 1" fundingID=8a18a691702520fb8486f630410de697b088777e4f31c3ce01e3005fd46f6e5a
+time="2024-04-20T23:17:39+02:00" level=trace msg="Received new block. From 191 to 192"
+time="2024-04-20T23:17:44+02:00" level=trace msg="Received new block. From 192 to 193"
+time="2024-04-20T23:17:49+02:00" level=trace msg="Received new block. From 193 to 194"
+time="2024-04-20T23:17:54+02:00" level=trace msg="Releasing version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:17:54+02:00" level=error msg="proposing channel failed: funding ledger channel: waiting for peer funding: Funding Error on asset [0] peers: [0], did not fund channel in time; "
+time="2024-04-20T23:17:54+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:17:55+02:00" level=trace msg="API request: 'open,peer_1,10,10'"
+time="2024-04-20T23:17:55+02:00" level=trace msg=Connecting...
+time="2024-04-20T23:17:55+02:00" level=debug msg="Proposing channel"
+time="2024-04-20T23:17:55+02:00" level=trace msg="Enabling version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:17:55+02:00" level=debug msg="Publishing message: LedgerChannelProposal: &{BaseChannelProposal:{ChallengeDuration:60 NonceShare:[139 153 26 76 253 4 140 195 206 211 254 80 226 239 238 10 130 116 38 72 53 101 38 208 14 147 125 125 58 250 108 45] App:0xc0003109b0 InitData:model: \nCIDLen: 0\nnumberOfRounds: 0\nround: 0\nroundPhase: 0\nweight: \naccuracy: [0 0 0]\nloss: [0 0 0]\nNext actor: 0\n InitBals:0xc0000aa0a0 FundingAgreement:[[+10000000000000000000 +10000000000000000000]]} Participant:0x734d5b853d333F916eD1D4175F3F0C0CA1469168 Peers:[0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 0x70765701b79a4e973dAbb4b30A72f5a845f22F9E]}" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:17:55+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:17:55+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:17:55+02:00" level=trace msg="EndpointRegistry.Get: peer not found, dialing..." id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:17:55+02:00" level=trace msg=EndpointRegistry.addEndpoint id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:17:55+02:00" level=debug msg="Unlocking account 0x734d5b853d333F916eD1D4175F3F0C0CA1469168"
+time="2024-04-20T23:17:55+02:00" level=trace msg="phase transition: InitActing->InitSigning" channel=0b912ed532f734ef74b2818c8cf3714284a2f36708a203d8c9695c63590b712a id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:17:55+02:00" level=debug msg="channelConn: publishing message: ChannelUpdateAcc: &{ChannelID:[11 145 46 213 50 247 52 239 116 178 129 140 140 243 113 66 132 162 243 103 8 162 3 216 201 105 92 99 89 11 113 42] Version:0 Sig:[7 116 7 116 164 240 114 227 163 20 43 202 8 183 229 124 150 220 1 125 126 73 131 247 174 243 87 61 254 215 88 208 125 29 48 184 10 191 198 148 223 113 250 32 240 4 110 205 215 202 167 184 84 217 176 237 207 99 42 59 108 221 211 213 28]}" channel=0b912ed532f734ef74b2818c8cf3714284a2f36708a203d8c9695c63590b712a id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:17:55+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:17:55+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:17:55+02:00" level=trace msg="EndpointRegistry.Get: peer connection established" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:17:55+02:00" level=trace msg="phase transition: InitSigning->Funding" channel=0b912ed532f734ef74b2818c8cf3714284a2f36708a203d8c9695c63590b712a id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:17:55+02:00" level=debug msg="Funding Channel." channel=0b912ed532f734ef74b2818c8cf3714284a2f36708a203d8c9695c63590b712a
+time="2024-04-20T23:17:55+02:00" level=debug msg="Resistant Event sub started at block: 195"
+time="2024-04-20T23:17:55+02:00" level=debug msg="Resistant Event sub started at block: 195"
+time="2024-04-20T23:17:55+02:00" level=error msg="Could not fund asset" asset=0x923439be515b6A928cB9650d70000a9044e49E85 error="AssetHolderETH depositing: insufficient funds for gas * price + value"
+time="2024-04-20T23:17:59+02:00" level=trace msg="Event sub was faster than head sub, ignored" hash=0x21d5825f2b3f6ec91670ec2f6c61a49dee9ca03c2ffe78cbcd996f3e57c03882
+time="2024-04-20T23:17:59+02:00" level=trace msg="Event preliminary included" hash=0x21d5825f2b3f6ec91670ec2f6c61a49dee9ca03c2ffe78cbcd996f3e57c03882
+time="2024-04-20T23:17:59+02:00" level=trace msg="Received new block. From 195 to 196"
+time="2024-04-20T23:17:59+02:00" level=trace msg="Event included 1 time(s)" hash=0x21d5825f2b3f6ec91670ec2f6c61a49dee9ca03c2ffe78cbcd996f3e57c03882
+time="2024-04-20T23:18:04+02:00" level=trace msg="Received new block. From 196 to 197"
+time="2024-04-20T23:18:04+02:00" level=trace msg="Event included 2 time(s)" hash=0x21d5825f2b3f6ec91670ec2f6c61a49dee9ca03c2ffe78cbcd996f3e57c03882
+time="2024-04-20T23:18:09+02:00" level=trace msg="Received new block. From 197 to 198"
+time="2024-04-20T23:18:09+02:00" level=debug msg="Event final after 3 block(s)" hash=0x21d5825f2b3f6ec91670ec2f6c61a49dee9ca03c2ffe78cbcd996f3e57c03882
+time="2024-04-20T23:18:09+02:00" level=debug msg="peer[0]: got: 10000000000000000000, remaining for [0,1] = 0. N: 1" fundingID=17cd9bd166bff7b45e127f646012ebeac7a66b3d36e89abcd05ffbb09dcbbb50
+time="2024-04-20T23:18:14+02:00" level=trace msg="Received new block. From 198 to 199"
+time="2024-04-20T23:18:19+02:00" level=trace msg="Received new block. From 199 to 200"
+time="2024-04-20T23:18:24+02:00" level=trace msg="Received new block. From 200 to 201"
+time="2024-04-20T23:18:25+02:00" level=trace msg="Releasing version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:18:25+02:00" level=error msg="proposing channel failed: funding ledger channel: waiting for peer funding: Funding Error on asset [0] peers: [0], did not fund channel in time; "
+time="2024-04-20T23:18:25+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:18:28+02:00" level=trace msg="API request: 'set,peer_0,QmPhnCkwemhbdGkKc71QUh4FcRS7uPmYZ7oP2pjN6BunDF,2,0,0,0'"
+time="2024-04-20T23:18:28+02:00" level=trace msg=Sending...
+time="2024-04-20T23:18:28+02:00" level=error msg="connect to peer first"
+time="2024-04-20T23:18:28+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:18:28+02:00" level=trace msg="API request: 'set,peer_1,QmPhnCkwemhbdGkKc71QUh4FcRS7uPmYZ7oP2pjN6BunDF,2,0,0,0'"
+time="2024-04-20T23:18:28+02:00" level=trace msg=Sending...
+time="2024-04-20T23:18:28+02:00" level=error msg="connect to peer first"
+time="2024-04-20T23:18:28+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:19:02+02:00" level=trace msg="API request: 'set,peer_0,QmSjFHVrYtyWjUA7PazAcmT8XbvhQzhQqSwTqdRtob2Vqk,2,0,0,99'"
+time="2024-04-20T23:19:02+02:00" level=trace msg=Sending...
+time="2024-04-20T23:19:02+02:00" level=error msg="connect to peer first"
+time="2024-04-20T23:19:02+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:19:02+02:00" level=trace msg="API request: 'set,peer_1,QmSjFHVrYtyWjUA7PazAcmT8XbvhQzhQqSwTqdRtob2Vqk,2,0,0,99'"
+time="2024-04-20T23:19:02+02:00" level=trace msg=Sending...
+time="2024-04-20T23:19:02+02:00" level=error msg="connect to peer first"
+time="2024-04-20T23:19:02+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:19:25+02:00" level=trace msg="API request: 'set,peer_0,Qmc5K6eyWrBbtHAYyNDMhLeLCaGyWo14psKUwQD3fztgJB,2,0,0,99'"
+time="2024-04-20T23:19:25+02:00" level=trace msg=Sending...
+time="2024-04-20T23:19:25+02:00" level=error msg="connect to peer first"
+time="2024-04-20T23:19:25+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:19:25+02:00" level=trace msg="API request: 'set,peer_1,Qmc5K6eyWrBbtHAYyNDMhLeLCaGyWo14psKUwQD3fztgJB,2,0,0,99'"
+time="2024-04-20T23:19:25+02:00" level=trace msg=Sending...
+time="2024-04-20T23:19:25+02:00" level=error msg="connect to peer first"
+time="2024-04-20T23:19:25+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:19:26+02:00" level=trace msg="API request: 'settle,peer_0,10,10'"
+time="2024-04-20T23:19:26+02:00" level=trace msg=Closing...
+time="2024-04-20T23:41:06+02:00" level=panic msg="err=runtime error: slice bounds out of range [2:0], trace=goroutine 1 [running]:\nruntime/debug.Stack()\n\t/usr/local/go/src/runtime/debug/stack.go:24 +0x65\nperun.network/perun-examples/app-channel/cmd.Execute.func1()\n\t/Users/pi/Desktop/fl-app-channel/cmd/root.go:43 +0x3d\npanic({0x1007889a0, 0xc000028e28})\n\t/usr/local/go/src/runtime/panic.go:884 +0x213\nperun.network/perun-examples/app-channel/cmd/client.importAccount({0x0, 0x0})\n\t/Users/pi/Desktop/fl-app-channel/cmd/client/node_setup.go:336 +0x5be\nperun.network/perun-examples/app-channel/cmd/client.newNode()\n\t/Users/pi/Desktop/fl-app-channel/cmd/client/node_setup.go:65 +0x3c\nperun.network/perun-examples/app-channel/cmd/client.Setup()\n\t/Users/pi/Desktop/fl-app-channel/cmd/client/node_setup.go:57 +0xc7\nperun.network/perun-examples/app-channel/cmd/client.runDemo(0x100d72c40?, {0x1007cf155?, 0x6?, 0x6?})\n\t/Users/pi/Desktop/fl-app-channel/cmd/client/demo.go:55 +0x1d\ngithub.com/spf13/cobra.(*Command).execute(0x100d72c40, {0xc0003ea0c0, 0x6, 0x6})\n\t/Users/pi/go/pkg/mod/github.com/spf13/cobra@v0.0.3/command.go:766 +0x663\ngithub.com/spf13/cobra.(*Command).ExecuteC(0x100d729e0)\n\t/Users/pi/go/pkg/mod/github.com/spf13/cobra@v0.0.3/command.go:852 +0x2e5\ngithub.com/spf13/cobra.(*Command).Execute(...)\n\t/Users/pi/go/pkg/mod/github.com/spf13/cobra@v0.0.3/command.go:800\nperun.network/perun-examples/app-channel/cmd.Execute()\n\t/Users/pi/Desktop/fl-app-channel/cmd/root.go:47 +0x46\nmain.main()\n\t/Users/pi/Desktop/fl-app-channel/main.go:24 +0x17\n\n"
+time="2024-04-20T23:46:15+02:00" level=debug msg="Unlocking account 0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184"
+time="2024-04-20T23:46:15+02:00" level=debug msg="Set contracts" Adj=0x079557d7549d7D44F4b00b51d2C532674129ed51 Asset=0x923439be515b6A928cB9650d70000a9044e49E85
+time="2024-04-20T23:46:15+02:00" level=debug msg="Created new account 0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75"
+time="2024-04-20T23:46:15+02:00" level=info msg="Generating account" off-chain=0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75
+time="2024-04-20T23:46:15+02:00" level=trace msg="Listening for connections" host="0.0.0.0:5752"
+time="2024-04-20T23:46:15+02:00" level=info msg="Persistence disabled"
+time="2024-04-20T23:46:15+02:00" level=info msg="Listening on: 0.0.0.0:8083"
+time="2024-04-20T23:46:15+02:00" level=trace msg="Started handling API requests"
+time="2024-04-20T23:46:22+02:00" level=trace msg="API request: 'open,peer_0,10,10'"
+time="2024-04-20T23:46:22+02:00" level=trace msg=Connecting...
+time="2024-04-20T23:46:22+02:00" level=debug msg="Proposing channel"
+time="2024-04-20T23:46:22+02:00" level=trace msg="Enabling version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:22+02:00" level=debug msg="Publishing message: LedgerChannelProposal: &{BaseChannelProposal:{ChallengeDuration:60 NonceShare:[124 147 84 206 54 5 72 86 7 133 197 174 149 101 71 106 190 34 131 245 153 190 112 228 120 242 10 75 155 113 80 195] App:0xc0000798b0 InitData:model: 0\nnumberOfRounds: 0\nround: 0\nroundPhase: 0\nweight: [0 0 0]\naccuracy: [0 0 0]\nloss: [0 0 0]\nNext actor: 0\n InitBals:0xc000040140 FundingAgreement:[[+10000000000000000000 +10000000000000000000]]} Participant:0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75 Peers:[0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 0x2EE1ac154435f542ECEc55C5b0367650d8A5343B]}" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:46:22+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:46:22+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:46:22+02:00" level=trace msg="EndpointRegistry.Get: peer not found, dialing..." id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:46:22+02:00" level=trace msg=EndpointRegistry.addEndpoint id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:46:22+02:00" level=debug msg="Unlocking account 0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75"
+time="2024-04-20T23:46:22+02:00" level=trace msg="phase transition: InitActing->InitSigning" channel=2c399e9343aeda3ae03f7a1b082f50a06afd5ebdc8762aeb91a207f686d4a3ff id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:22+02:00" level=debug msg="channelConn: publishing message: ChannelUpdateAcc: &{ChannelID:[44 57 158 147 67 174 218 58 224 63 122 27 8 47 80 160 106 253 94 189 200 118 42 235 145 162 7 246 134 212 163 255] Version:0 Sig:[74 148 213 228 83 193 47 195 31 238 55 198 32 124 45 202 73 95 193 64 92 68 20 163 216 145 232 133 11 167 39 148 68 180 100 223 157 152 166 139 10 251 241 93 45 126 31 10 221 164 75 163 207 8 166 234 136 147 170 254 185 197 123 47 28]}" channel=2c399e9343aeda3ae03f7a1b082f50a06afd5ebdc8762aeb91a207f686d4a3ff id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:46:22+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:46:22+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:46:22+02:00" level=trace msg="EndpointRegistry.Get: peer connection established" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
+time="2024-04-20T23:46:22+02:00" level=trace msg="phase transition: InitSigning->Funding" channel=2c399e9343aeda3ae03f7a1b082f50a06afd5ebdc8762aeb91a207f686d4a3ff id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:22+02:00" level=debug msg="Funding Channel." channel=2c399e9343aeda3ae03f7a1b082f50a06afd5ebdc8762aeb91a207f686d4a3ff
+time="2024-04-20T23:46:22+02:00" level=debug msg="Resistant Event sub started at block: 18"
+time="2024-04-20T23:46:22+02:00" level=debug msg="Resistant Event sub started at block: 18"
+time="2024-04-20T23:46:26+02:00" level=trace msg="Event sub was faster than head sub, ignored" hash=0x304389307baa2b073cbfd828aa080d3afa09d9c0a51a0c5468845694391f1855
+time="2024-04-20T23:46:26+02:00" level=trace msg="Event preliminary included" hash=0x304389307baa2b073cbfd828aa080d3afa09d9c0a51a0c5468845694391f1855
+time="2024-04-20T23:46:26+02:00" level=trace msg="Event sub was faster than head sub, ignored" hash=0xf6d264b1d3ada07d3433cc0c50780b47d1f94d2d4a3606bf80eefc0dc4a28e85
+time="2024-04-20T23:46:26+02:00" level=trace msg="Event preliminary included" hash=0xf6d264b1d3ada07d3433cc0c50780b47d1f94d2d4a3606bf80eefc0dc4a28e85
+time="2024-04-20T23:46:26+02:00" level=trace msg="Received new block. From 18 to 19"
+time="2024-04-20T23:46:26+02:00" level=trace msg="Event included 1 time(s)" hash=0x304389307baa2b073cbfd828aa080d3afa09d9c0a51a0c5468845694391f1855
+time="2024-04-20T23:46:26+02:00" level=trace msg="Event included 1 time(s)" hash=0xf6d264b1d3ada07d3433cc0c50780b47d1f94d2d4a3606bf80eefc0dc4a28e85
+time="2024-04-20T23:46:31+02:00" level=trace msg="Received new block. From 19 to 20"
+time="2024-04-20T23:46:31+02:00" level=trace msg="Event included 2 time(s)" hash=0x304389307baa2b073cbfd828aa080d3afa09d9c0a51a0c5468845694391f1855
+time="2024-04-20T23:46:31+02:00" level=trace msg="Event included 2 time(s)" hash=0xf6d264b1d3ada07d3433cc0c50780b47d1f94d2d4a3606bf80eefc0dc4a28e85
+time="2024-04-20T23:46:36+02:00" level=trace msg="Received new block. From 20 to 21"
+time="2024-04-20T23:46:36+02:00" level=debug msg="Event final after 3 block(s)" hash=0x304389307baa2b073cbfd828aa080d3afa09d9c0a51a0c5468845694391f1855
+time="2024-04-20T23:46:36+02:00" level=debug msg="Event final after 3 block(s)" hash=0xf6d264b1d3ada07d3433cc0c50780b47d1f94d2d4a3606bf80eefc0dc4a28e85
+time="2024-04-20T23:46:36+02:00" level=debug msg="peer[0]: got: 10000000000000000000, remaining for [0,1] = 0. N: 1" fundingID=0f550f702bc42e8f8b16a3e77f598e0d160a2ddacff081f4b101cf8d30414004
+time="2024-04-20T23:46:36+02:00" level=debug msg="peer[0]: got: 10000000000000000000, remaining for [0,0] = 0. N: 0" fundingID=6aa487a8b58c8ba9abfd1374efc2f7800150bb7a9d68d873711ebb68ae59dcc7
+time="2024-04-20T23:46:36+02:00" level=debug msg="Mined TX: 0xf6d264b1d3ada07d3433cc0c50780b47d1f94d2d4a3606bf80eefc0dc4a28e85"
+time="2024-04-20T23:46:36+02:00" level=trace msg="phase transition: Funding->Acting" channel=2c399e9343aeda3ae03f7a1b082f50a06afd5ebdc8762aeb91a207f686d4a3ff id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:36+02:00" level=trace msg="IncrementUsage 0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75"
+time="2024-04-20T23:46:36+02:00" level=trace msg="Releasing version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:36+02:00" level=debug msg="data: \"channel opened with peer_0\""
+time="2024-04-20T23:46:36+02:00" level=debug msg="Watcher started" channel=2c399e9343aeda3ae03f7a1b082f50a06afd5ebdc8762aeb91a207f686d4a3ff
+time="2024-04-20T23:46:36+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:46:36+02:00" level=debug msg="Resistant Event sub started at block: 21"
+time="2024-04-20T23:46:37+02:00" level=trace msg="API request: 'open,peer_1,10,10'"
+time="2024-04-20T23:46:37+02:00" level=trace msg=Connecting...
+time="2024-04-20T23:46:37+02:00" level=debug msg="Proposing channel"
+time="2024-04-20T23:46:37+02:00" level=trace msg="Enabling version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:37+02:00" level=debug msg="Publishing message: LedgerChannelProposal: &{BaseChannelProposal:{ChallengeDuration:60 NonceShare:[70 181 137 113 34 151 224 214 12 248 73 17 169 29 214 68 169 61 2 93 38 54 252 12 0 58 181 92 255 83 252 217] App:0xc0000798b0 InitData:model: 0\nnumberOfRounds: 0\nround: 0\nroundPhase: 0\nweight: [0 0 0]\naccuracy: [0 0 0]\nloss: [0 0 0]\nNext actor: 0\n InitBals:0xc0002fa280 FundingAgreement:[[+10000000000000000000 +10000000000000000000]]} Participant:0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75 Peers:[0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 0x70765701b79a4e973dAbb4b30A72f5a845f22F9E]}" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:46:37+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:46:37+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:46:37+02:00" level=trace msg="EndpointRegistry.Get: peer not found, dialing..." id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:46:37+02:00" level=trace msg=EndpointRegistry.addEndpoint id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:46:37+02:00" level=debug msg="Unlocking account 0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75"
+time="2024-04-20T23:46:37+02:00" level=trace msg="phase transition: InitActing->InitSigning" channel=7e0d6bb4fabf8c1f37414a0bd0d8088662e74e921c2c6141acafcd214d6096a1 id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:37+02:00" level=debug msg="channelConn: publishing message: ChannelUpdateAcc: &{ChannelID:[126 13 107 180 250 191 140 31 55 65 74 11 208 216 8 134 98 231 78 146 28 44 97 65 172 175 205 33 77 96 150 161] Version:0 Sig:[67 73 207 137 209 110 169 126 136 182 31 234 1 210 93 124 254 1 60 125 163 41 221 216 220 119 232 218 199 48 240 252 53 214 109 140 219 17 105 62 76 231 99 58 48 34 243 213 235 244 78 41 151 97 224 35 72 64 89 99 64 131 218 22 28]}" channel=7e0d6bb4fabf8c1f37414a0bd0d8088662e74e921c2c6141acafcd214d6096a1 id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:46:37+02:00" level=trace msg="Bus.Publish attempt: 1/3"
+time="2024-04-20T23:46:37+02:00" level=trace msg=EndpointRegistry.Get id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:46:37+02:00" level=trace msg="EndpointRegistry.Get: peer connection established" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184 peer=0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
+time="2024-04-20T23:46:37+02:00" level=trace msg="phase transition: InitSigning->Funding" channel=7e0d6bb4fabf8c1f37414a0bd0d8088662e74e921c2c6141acafcd214d6096a1 id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:37+02:00" level=debug msg="Funding Channel." channel=7e0d6bb4fabf8c1f37414a0bd0d8088662e74e921c2c6141acafcd214d6096a1
+time="2024-04-20T23:46:37+02:00" level=debug msg="Resistant Event sub started at block: 21"
+time="2024-04-20T23:46:37+02:00" level=debug msg="Resistant Event sub started at block: 21"
+time="2024-04-20T23:46:41+02:00" level=trace msg="Event sub was faster than head sub, ignored" hash=0xcbd3ef733c2de91b9c1b8708ad951e578830b450130d128ca1d2b94b8d81a71f
+time="2024-04-20T23:46:41+02:00" level=trace msg="Event preliminary included" hash=0xcbd3ef733c2de91b9c1b8708ad951e578830b450130d128ca1d2b94b8d81a71f
+time="2024-04-20T23:46:41+02:00" level=trace msg="Event sub was faster than head sub, ignored" hash=0xb65baea991a3f45a25dbdfa1839c4467d9c2579ce59a538da4e0d7fc643b5f0f
+time="2024-04-20T23:46:41+02:00" level=trace msg="Event preliminary included" hash=0xb65baea991a3f45a25dbdfa1839c4467d9c2579ce59a538da4e0d7fc643b5f0f
+time="2024-04-20T23:46:41+02:00" level=trace msg="Received new block. From 21 to 22"
+time="2024-04-20T23:46:41+02:00" level=trace msg="Received new block. From 21 to 22"
+time="2024-04-20T23:46:41+02:00" level=trace msg="Event included 1 time(s)" hash=0xcbd3ef733c2de91b9c1b8708ad951e578830b450130d128ca1d2b94b8d81a71f
+time="2024-04-20T23:46:41+02:00" level=trace msg="Event included 1 time(s)" hash=0xb65baea991a3f45a25dbdfa1839c4467d9c2579ce59a538da4e0d7fc643b5f0f
+time="2024-04-20T23:46:46+02:00" level=trace msg="Received new block. From 22 to 23"
+time="2024-04-20T23:46:46+02:00" level=trace msg="Received new block. From 22 to 23"
+time="2024-04-20T23:46:46+02:00" level=trace msg="Event included 2 time(s)" hash=0xcbd3ef733c2de91b9c1b8708ad951e578830b450130d128ca1d2b94b8d81a71f
+time="2024-04-20T23:46:46+02:00" level=trace msg="Event included 2 time(s)" hash=0xb65baea991a3f45a25dbdfa1839c4467d9c2579ce59a538da4e0d7fc643b5f0f
+time="2024-04-20T23:46:51+02:00" level=trace msg="Received new block. From 23 to 24"
+time="2024-04-20T23:46:51+02:00" level=trace msg="Received new block. From 23 to 24"
+time="2024-04-20T23:46:51+02:00" level=debug msg="Event final after 3 block(s)" hash=0xcbd3ef733c2de91b9c1b8708ad951e578830b450130d128ca1d2b94b8d81a71f
+time="2024-04-20T23:46:51+02:00" level=debug msg="Event final after 3 block(s)" hash=0xb65baea991a3f45a25dbdfa1839c4467d9c2579ce59a538da4e0d7fc643b5f0f
+time="2024-04-20T23:46:51+02:00" level=debug msg="peer[0]: got: 10000000000000000000, remaining for [0,0] = 0. N: 1" fundingID=8d3fe091f3f9ba87391df086472c6e612cc4bbc670f3e47c325a06b18f95e1ed
+time="2024-04-20T23:46:51+02:00" level=debug msg="peer[0]: got: 10000000000000000000, remaining for [0,1] = 0. N: 0" fundingID=282febe6b845bbf09af831b297ba070765356177171cd3ac82672bf94592126b
+time="2024-04-20T23:46:51+02:00" level=debug msg="Mined TX: 0xcbd3ef733c2de91b9c1b8708ad951e578830b450130d128ca1d2b94b8d81a71f"
+time="2024-04-20T23:46:51+02:00" level=trace msg="phase transition: Funding->Acting" channel=7e0d6bb4fabf8c1f37414a0bd0d8088662e74e921c2c6141acafcd214d6096a1 id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:51+02:00" level=trace msg="IncrementUsage 0xf661a08B6fE415C002B7f2BD11270c2B6c1F4D75"
+time="2024-04-20T23:46:51+02:00" level=trace msg="Releasing version 1 cache" id=0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
+time="2024-04-20T23:46:51+02:00" level=debug msg="data: \"channel opened with peer_1\""
+time="2024-04-20T23:46:51+02:00" level=debug msg="Watcher started" channel=7e0d6bb4fabf8c1f37414a0bd0d8088662e74e921c2c6141acafcd214d6096a1
+time="2024-04-20T23:46:51+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:46:51+02:00" level=debug msg="Resistant Event sub started at block: 24"
+time="2024-04-20T23:46:52+02:00" level=trace msg="API request: 'settle,peer_0,10,10'"
+time="2024-04-20T23:46:52+02:00" level=trace msg=Closing...
+time="2024-04-20T23:46:52+02:00" level=error msg="Cannot close channel: channel state is not final with peer: peer_0"
+time="2024-04-20T23:46:52+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:46:53+02:00" level=trace msg="API request: 'settle,peer_1,10,10'"
+time="2024-04-20T23:46:53+02:00" level=trace msg=Closing...
+time="2024-04-20T23:46:53+02:00" level=error msg="Cannot close channel: channel state is not final with peer: peer_1"
+time="2024-04-20T23:46:53+02:00" level=error msg="Socket reading: EOF"
+time="2024-04-20T23:46:56+02:00" level=trace msg="Received new block. From 24 to 25"
+time="2024-04-20T23:46:56+02:00" level=trace msg="Received new block. From 24 to 25"
+time="2024-04-20T23:47:01+02:00" level=trace msg="Received new block. From 25 to 26"
+time="2024-04-20T23:47:01+02:00" level=trace msg="Received new block. From 25 to 26"
+time="2024-04-20T23:47:06+02:00" level=trace msg="Received new block. From 26 to 27"
+time="2024-04-20T23:47:06+02:00" level=trace msg="Received new block. From 26 to 27"
+time="2024-04-20T23:47:11+02:00" level=trace msg="Received new block. From 27 to 28"
+time="2024-04-20T23:47:11+02:00" level=trace msg="Received new block. From 27 to 28"
+time="2024-04-20T23:47:16+02:00" level=trace msg="Received new block. From 28 to 29"
+time="2024-04-20T23:47:16+02:00" level=trace msg="Received new block. From 28 to 29"
+time="2024-04-20T23:47:21+02:00" level=trace msg="Received new block. From 29 to 30"
+time="2024-04-20T23:47:21+02:00" level=trace msg="Received new block. From 29 to 30"
+time="2024-04-20T23:47:26+02:00" level=trace msg="Received new block. From 30 to 31"
+time="2024-04-20T23:47:26+02:00" level=trace msg="Received new block. From 30 to 31"
+time="2024-04-20T23:47:31+02:00" level=trace msg="Received new block. From 31 to 32"
+time="2024-04-20T23:47:31+02:00" level=trace msg="Received new block. From 31 to 32"
+time="2024-04-20T23:47:36+02:00" level=trace msg="Received new block. From 32 to 33"
+time="2024-04-20T23:47:36+02:00" level=trace msg="Received new block. From 32 to 33"
+time="2024-04-20T23:47:41+02:00" level=trace msg="Received new block. From 33 to 34"
+time="2024-04-20T23:47:41+02:00" level=trace msg="Received new block. From 33 to 34"
+time="2024-04-20T23:47:46+02:00" level=trace msg="Received new block. From 34 to 35"
+time="2024-04-20T23:47:46+02:00" level=trace msg="Received new block. From 34 to 35"
+time="2024-04-20T23:47:51+02:00" level=trace msg="Received new block. From 35 to 36"
+time="2024-04-20T23:47:51+02:00" level=trace msg="Received new block. From 35 to 36"
+time="2024-04-20T23:47:56+02:00" level=trace msg="Received new block. From 36 to 37"
+time="2024-04-20T23:47:56+02:00" level=trace msg="Received new block. From 36 to 37"
+time="2024-04-20T23:48:01+02:00" level=trace msg="Received new block. From 37 to 38"
+time="2024-04-20T23:48:01+02:00" level=trace msg="Received new block. From 37 to 38"
+time="2024-04-20T23:48:06+02:00" level=trace msg="Received new block. From 38 to 39"
+time="2024-04-20T23:48:06+02:00" level=trace msg="Received new block. From 38 to 39"
+time="2024-04-20T23:48:11+02:00" level=trace msg="Received new block. From 39 to 40"
+time="2024-04-20T23:48:11+02:00" level=trace msg="Received new block. From 39 to 40"
+time="2024-04-20T23:48:16+02:00" level=trace msg="Received new block. From 40 to 41"
+time="2024-04-20T23:48:16+02:00" level=trace msg="Received new block. From 40 to 41"
+time="2024-04-20T23:48:21+02:00" level=trace msg="Received new block. From 41 to 42"
+time="2024-04-20T23:48:21+02:00" level=trace msg="Received new block. From 41 to 42"
+time="2024-04-20T23:48:26+02:00" level=trace msg="Received new block. From 42 to 43"
+time="2024-04-20T23:48:26+02:00" level=trace msg="Received new block. From 42 to 43"
+time="2024-04-20T23:48:31+02:00" level=trace msg="Received new block. From 43 to 44"
+time="2024-04-20T23:48:31+02:00" level=trace msg="Received new block. From 43 to 44"
+time="2024-04-20T23:48:36+02:00" level=trace msg="Received new block. From 44 to 45"
+time="2024-04-20T23:48:36+02:00" level=trace msg="Received new block. From 44 to 45"
+time="2024-04-20T23:48:41+02:00" level=trace msg="Received new block. From 45 to 46"
+time="2024-04-20T23:48:41+02:00" level=trace msg="Received new block. From 45 to 46"
+time="2024-04-20T23:48:46+02:00" level=trace msg="Received new block. From 46 to 47"
+time="2024-04-20T23:48:46+02:00" level=trace msg="Received new block. From 46 to 47"
+time="2024-04-20T23:48:51+02:00" level=trace msg="Received new block. From 47 to 48"
+time="2024-04-20T23:48:51+02:00" level=trace msg="Received new block. From 47 to 48"
+time="2024-04-20T23:48:56+02:00" level=trace msg="Received new block. From 48 to 49"
+time="2024-04-20T23:48:56+02:00" level=trace msg="Received new block. From 48 to 49"
+time="2024-04-20T23:49:01+02:00" level=trace msg="Received new block. From 49 to 50"
+time="2024-04-20T23:49:01+02:00" level=trace msg="Received new block. From 49 to 50"
+time="2024-04-20T23:49:06+02:00" level=trace msg="Received new block. From 50 to 51"
+time="2024-04-20T23:49:06+02:00" level=trace msg="Received new block. From 50 to 51"
+time="2024-04-20T23:49:11+02:00" level=trace msg="Received new block. From 51 to 52"
+time="2024-04-20T23:49:11+02:00" level=trace msg="Received new block. From 51 to 52"
+time="2024-04-20T23:49:16+02:00" level=trace msg="Received new block. From 52 to 53"
+time="2024-04-20T23:49:16+02:00" level=trace msg="Received new block. From 52 to 53"
+time="2024-04-20T23:49:21+02:00" level=trace msg="Received new block. From 53 to 54"
+time="2024-04-20T23:49:21+02:00" level=trace msg="Received new block. From 53 to 54"
+time="2024-04-20T23:49:26+02:00" level=trace msg="Received new block. From 54 to 55"
+time="2024-04-20T23:49:26+02:00" level=trace msg="Received new block. From 54 to 55"
+time="2024-04-20T23:49:31+02:00" level=trace msg="Received new block. From 55 to 56"
+time="2024-04-20T23:49:31+02:00" level=trace msg="Received new block. From 55 to 56"
+time="2024-04-20T23:49:36+02:00" level=trace msg="Received new block. From 56 to 57"
+time="2024-04-20T23:49:36+02:00" level=trace msg="Received new block. From 56 to 57"
+time="2024-04-20T23:49:41+02:00" level=trace msg="Received new block. From 57 to 58"
+time="2024-04-20T23:49:41+02:00" level=trace msg="Received new block. From 57 to 58"
+time="2024-04-20T23:49:46+02:00" level=trace msg="Received new block. From 58 to 59"
+time="2024-04-20T23:49:46+02:00" level=trace msg="Received new block. From 58 to 59"
+time="2024-04-20T23:49:51+02:00" level=trace msg="Received new block. From 59 to 60"
+time="2024-04-20T23:49:51+02:00" level=trace msg="Received new block. From 59 to 60"
+time="2024-04-20T23:49:56+02:00" level=trace msg="Received new block. From 60 to 61"
+time="2024-04-20T23:49:56+02:00" level=trace msg="Received new block. From 60 to 61"
+time="2024-04-20T23:50:01+02:00" level=trace msg="Received new block. From 61 to 62"
+time="2024-04-20T23:50:01+02:00" level=trace msg="Received new block. From 61 to 62"
+time="2024-04-20T23:50:06+02:00" level=trace msg="Received new block. From 62 to 63"
+time="2024-04-20T23:50:06+02:00" level=trace msg="Received new block. From 62 to 63"
+time="2024-04-20T23:50:11+02:00" level=trace msg="Received new block. From 63 to 64"
+time="2024-04-20T23:50:11+02:00" level=trace msg="Received new block. From 63 to 64"
+time="2024-04-20T23:50:16+02:00" level=trace msg="Received new block. From 64 to 65"
+time="2024-04-20T23:50:16+02:00" level=trace msg="Received new block. From 64 to 65"
+time="2024-04-20T23:50:21+02:00" level=trace msg="Received new block. From 65 to 66"
+time="2024-04-20T23:50:21+02:00" level=trace msg="Received new block. From 65 to 66"
+time="2024-04-20T23:50:26+02:00" level=trace msg="Received new block. From 66 to 67"
+time="2024-04-20T23:50:26+02:00" level=trace msg="Received new block. From 66 to 67"
+time="2024-04-20T23:50:31+02:00" level=trace msg="Received new block. From 67 to 68"
+time="2024-04-20T23:50:31+02:00" level=trace msg="Received new block. From 67 to 68"
+time="2024-04-20T23:50:36+02:00" level=trace msg="Received new block. From 68 to 69"
+time="2024-04-20T23:50:36+02:00" level=trace msg="Received new block. From 68 to 69"
+time="2024-04-20T23:50:41+02:00" level=trace msg="Received new block. From 69 to 70"
+time="2024-04-20T23:50:41+02:00" level=trace msg="Received new block. From 69 to 70"
+time="2024-04-20T23:50:46+02:00" level=trace msg="Received new block. From 70 to 71"
+time="2024-04-20T23:50:46+02:00" level=trace msg="Received new block. From 70 to 71"
+time="2024-04-20T23:50:51+02:00" level=trace msg="Received new block. From 71 to 72"
+time="2024-04-20T23:50:51+02:00" level=trace msg="Received new block. From 71 to 72"
+time="2024-04-20T23:50:56+02:00" level=trace msg="Received new block. From 72 to 73"
+time="2024-04-20T23:50:56+02:00" level=trace msg="Received new block. From 72 to 73"
+time="2024-04-20T23:51:01+02:00" level=trace msg="Received new block. From 73 to 74"
+time="2024-04-20T23:51:01+02:00" level=trace msg="Received new block. From 73 to 74"
+time="2024-04-20T23:51:06+02:00" level=trace msg="Received new block. From 74 to 75"
+time="2024-04-20T23:51:06+02:00" level=trace msg="Received new block. From 74 to 75"
+time="2024-04-20T23:51:11+02:00" level=trace msg="Received new block. From 75 to 76"
+time="2024-04-20T23:51:11+02:00" level=trace msg="Received new block. From 75 to 76"
+time="2024-04-20T23:51:16+02:00" level=trace msg="Received new block. From 76 to 77"
+time="2024-04-20T23:51:16+02:00" level=trace msg="Received new block. From 76 to 77"
