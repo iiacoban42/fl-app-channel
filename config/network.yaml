@@ -3,14 +3,29 @@ peers:
     perunID: 0x2EE1ac154435f542ECEc55C5b0367650d8A5343B
     hostname: 127.0.0.1
     port: 5750
-    apiPort: 8081
+    apiport: 8081
   peer_1:
     perunID: 0x70765701b79a4e973dAbb4b30A72f5a845f22F9E
     hostname: 127.0.0.1
     port: 5751
-    APIPort: 8082
+    apiport: 8082
   peer_2:
     perunID: 0xF73C1cdA5bD32E6693D3cB313Bd9B9338d96f184
     hostname: 127.0.0.1
     port: 5752
-    APIPort: 8083
+    apiport: 8083
+  peer_3:
+    perunID: 0xC1b2444C0aAD4DE3f1E76C2F617B593eba75cb5a
+    hostname: 127.0.0.1
+    port: 5753
+    apiport: 8084
+  peer_4:
+    perunID: 0x12A6C524c720759d275236a5725134Eb1c4749dD
+    hostname: 127.0.0.1
+    port: 5754
+    apiport: 8085
+  peer_5:
+    perunID: 0x22D173f535923E5904C346B0C5c7751a4C648Db8
+    hostname: 127.0.0.1
+    port: 5755
+    apiport: 8086
