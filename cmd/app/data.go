@@ -18,8 +18,8 @@ type FLAppData struct {
 	Round 	   uint8
 	RoundPhase uint8
 	Weight 	  string
-	Accuracy  [3]uint8
-	Loss 	  [3]uint8
+	Accuracy  [10]uint8
+	Loss 	  [10]uint8
 }
 
 func (d *FLAppData) String() string {
